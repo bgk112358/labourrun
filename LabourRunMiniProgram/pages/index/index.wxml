@@ -1,0 +1,103 @@
+<nav-bar title="首页" />
+<view class="page-home">
+  <view class="notice-strip" wx:if="{{activity && activity.noticeText}}">
+    <view class="notice-badge">★</view>
+    <text class="notice-text">{{activity.noticeText}}</text>
+  </view>
+
+  <view class="loading-tip" wx:if="{{loading}}">加载中...</view>
+  <view class="error-bar" wx:if="{{error}}" bindtap="onRetry">{{error}}，点击重试</view>
+
+  <view class="board">
+    <view class="mountain mountain-a"></view>
+    <view class="mountain mountain-b"></view>
+    <view class="mountain mountain-c"></view>
+    <view class="star star-a"></view>
+    <view class="star star-b"></view>
+    <view class="star star-c"></view>
+    <view class="star star-d"></view>
+    <view class="sign">活动须知</view>
+    <view class="pencil">
+      <view class="pencil-eraser"></view>
+      <view class="pencil-body"></view>
+      <view class="pencil-tip"></view>
+    </view>
+  </view>
+
+  <view class="rules-card" wx:if="{{rules.length}}">
+    <view class="card-dots">
+      <view class="dot dot-purple"></view>
+      <view class="dot dot-yellow"></view>
+      <view class="dot dot-pink"></view>
+    </view>
+    <view class="rule" wx:for="{{rules}}" wx:key="no">
+      <view class="rule-badge">{{item.no}}</view>
+      <text class="rule-text">{{item.text}}</text>
+    </view>
+  </view>
+
+  <view class="section-title">
+    <view class="title-line"></view>
+    <text class="title-text">参赛报名</text>
+    <view class="title-line"></view>
+  </view>
+
+  <view class="reg-status {{isRegistered ? 'is-registered' : ''}} {{isCancelled ? 'is-cancelled' : ''}}" wx:if="{{statusText}}">
+    {{statusText}}
+  </view>
+
+  <view class="form-list">
+    <view class="form-row">
+      <text class="form-label">姓名<text class="required">*</text></text>
+      <input
+        class="form-input"
+        value="{{form.realName}}"
+        placeholder="请输入姓名"
+        placeholder-class="form-placeholder"
+        maxlength="20"
+        disabled="{{submitting}}"
+        bindinput="onNameInput"
+      />
+    </view>
+    <view class="form-row">
+      <text class="form-label">电话<text class="required">*</text></text>
+      <view class="form-right">
+        <input
+          class="form-input phone-input"
+          type="number"
+          value="{{form.phone}}"
+          placeholder="请输入手机号"
+          placeholder-class="form-placeholder"
+          maxlength="11"
+          disabled="{{submitting}}"
+          bindinput="onPhoneInput"
+        />
+        <text class="form-hint">11位</text>
+      </view>
+    </view>
+    <view class="form-row">
+      <text class="form-label">工作单位<text class="required">*</text></text>
+      <input
+        class="form-input"
+        value="{{form.company}}"
+        placeholder="请输入工作单位"
+        placeholder-class="form-placeholder"
+        maxlength="50"
+        disabled="{{submitting}}"
+        bindinput="onCompanyInput"
+      />
+    </view>
+  </view>
+
+  <view class="submit-bar">
+    <button
+      class="submit-btn"
+      loading="{{submitting}}"
+      disabled="{{submitting || loading}}"
+      bindtap="onSubmit"
+    >{{submitText}}</button>
+    <view class="cancel-link" wx:if="{{isRegistered}}" bindtap="onCancel">
+      取消报名
+    </view>
+  </view>
+</view>

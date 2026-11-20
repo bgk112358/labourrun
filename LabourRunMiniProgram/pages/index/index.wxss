@@ -240,3 +240,110 @@
   font-size: 26rpx;
   color: #999999;
 }
+
+/* 报名输入与状态 */
+.page-home {
+  padding-bottom: calc(260rpx + env(safe-area-inset-bottom));
+}
+
+.form-input {
+  flex: 1;
+  height: 60rpx;
+  margin-left: 20rpx;
+  color: #1A1A1A;
+  font-size: 28rpx;
+  text-align: right;
+}
+
+.phone-input {
+  min-width: 0;
+}
+
+.form-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.reg-status {
+  width: 690rpx;
+  margin: 0 auto 18rpx;
+  padding: 12rpx 20rpx;
+  border-radius: 10rpx;
+  background: #F1F5F9;
+  color: #64748B;
+  font-size: 24rpx;
+  text-align: center;
+}
+
+.reg-status.is-registered {
+  background: #FFF3EE;
+  color: #E93B33;
+}
+
+.reg-status.is-cancelled {
+  background: #F5F5F5;
+  color: #999999;
+}
+
+.submit-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(98rpx + env(safe-area-inset-bottom));
+  z-index: 900;
+  padding: 16rpx 30rpx;
+  background: #FFFFFF;
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, .05);
+}
+
+.submit-btn {
+  width: 100%;
+  height: 88rpx;
+  padding: 0;
+  border-radius: 44rpx;
+  background: linear-gradient(90deg, #F4533F, #F98C76);
+  color: #FFFFFF;
+  font-size: 30rpx;
+  font-weight: 600;
+  line-height: 88rpx;
+}
+
+.submit-btn::after {
+  border: none;
+}
+
+.submit-btn[disabled] {
+  background: linear-gradient(90deg, #F4533F, #F98C76);
+  color: #FFFFFF;
+  opacity: .6;
+}
+
+.cancel-link {
+  margin-top: 14rpx;
+  color: #999999;
+  font-size: 26rpx;
+  text-align: center;
+}
+
+.error-bar,
+.loading-tip {
+  margin: 16rpx 30rpx 0;
+  padding: 14rpx 20rpx;
+  border-radius: 10rpx;
+  font-size: 24rpx;
+  text-align: center;
+}
+
+.error-bar {
+  background: #FFF1F0;
+  border: 1rpx solid #FFCCC7;
+  color: #E93B33;
+}
+
+.loading-tip {
+  background: #FFFFFF;
+  color: #999999;
+}

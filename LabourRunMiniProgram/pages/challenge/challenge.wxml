@@ -1,0 +1,51 @@
+<nav-bar title="挑战详情" />
+<view class="page-challenge">
+  <view class="loading-tip" wx:if="{{loading}}">加载中...</view>
+  <view class="error-bar" wx:if="{{error}}" bindtap="onRetry">{{error}}，点击重试</view>
+
+  <block wx:if="{{challenge}}">
+    <view class="challenge-hero">
+      <view class="hero-top">
+        <text class="hero-title">{{challenge.title}}</text>
+        <text class="status-pill">{{statusText}}</text>
+      </view>
+      <view class="hero-date">
+        {{challenge.startDate}} 开始
+        <text wx:if="{{challenge.endDate}}"> · {{challenge.endDate}} 结束</text>
+      </view>
+
+      <view class="hero-metrics">
+        <view class="metric">
+          <text class="metric-num">{{challenge.targetSteps}}</text>
+          <text class="metric-label">目标步数</text>
+        </view>
+        <view class="metric">
+          <text class="metric-num">{{challenge.depositCoupons}}</text>
+          <text class="metric-label">挑战保证金</text>
+        </view>
+        <view class="metric">
+          <text class="metric-num">{{challenge.participantCount}}</text>
+          <text class="metric-label">参与人数</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="rules-panel">
+      <view class="panel-title">挑战规则</view>
+      <view class="challenge-rule" wx:for="{{rules}}" wx:key="title">
+        <view class="rule-index">{{index + 1}}</view>
+        <view class="rule-content">
+          <view class="rule-title">{{item.title}}</view>
+          <view class="rule-text">{{item.content}}</view>
+        </view>
+      </view>
+      <view class="empty-tip" wx:if="{{!rules.length}}">暂无挑战规则</view>
+    </view>
+
+    <view class="notice-box">
+      本期挑战以展示为主，参赛、保证金扣退和完成判定流程以后续开放为准。
+    </view>
+
+    <button class="share-btn" open-type="share">邀请好友参加</button>
+  </block>
+</view>

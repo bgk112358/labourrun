@@ -1,3 +1,5 @@
+const auth = require('./utils/auth')
+
 App({
   globalData: {
     statusBarHeight: 20,
@@ -20,5 +22,10 @@ App({
     } catch (e) {}
     this.globalData.statusBarHeight = statusBarHeight
     this.globalData.navContentHeight = navContentHeight
+
+    // 启动时预热登录；页面 onShow 仍会兜底调用 ensureLogin
+    this.loginReady = auth.ensureLogin().catch(function () {
+      return null
+    })
   }
 })

@@ -2,7 +2,9 @@
   "pages": [
     "pages/index/index",
     "pages/steps/steps",
-    "pages/user/user"
+    "pages/user/user",
+    "pages/challenge/challenge",
+    "pages/coupon/coupon"
   ],
   "window": {
     "backgroundTextStyle": "dark",

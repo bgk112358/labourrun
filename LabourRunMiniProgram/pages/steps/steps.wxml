@@ -1,17 +1,20 @@
 <nav-bar title="步数宝" />
 <view class="page-steps">
+  <view class="loading-tip" wx:if="{{loading}}">加载中...</view>
+  <view class="error-bar" wx:if="{{error}}" bindtap="onRetry">{{error}}，点击重试</view>
+
   <!-- 兑换券条 -->
-  <view class="coupon-bar">
+  <view class="coupon-bar" bindtap="onCouponTap">
     <view class="coin"><text>¥</text></view>
     <text class="coupon-label">我的兑换券</text>
-    <text class="coupon-value">19.00</text>
+    <text class="coupon-value">{{couponBalance}}</text>
     <view class="coupon-arrow"></view>
   </view>
 
   <!-- 天空区 -->
   <view class="sky">
     <view class="sky-left">
-      <view class="sky-entry">
+      <view class="sky-entry" bindtap="onRankingTap">
         <view class="trophy">
           <view class="trophy-cup"></view>
           <view class="trophy-stem"></view>
@@ -19,7 +22,7 @@
         </view>
         <text>排行榜</text>
       </view>
-      <view class="sky-entry">
+      <view class="sky-entry" bindtap="onHomeTap">
         <view class="mini-house">
           <view class="mini-roof"></view>
           <view class="mini-body"></view>
@@ -27,7 +30,7 @@
         <text>回首页</text>
       </view>
     </view>
-    <view class="rule-capsule">规则</view>
+    <view class="rule-capsule" bindtap="onRulesTap">规则</view>
     <view class="hill hill-back"></view>
     <view class="hill hill-front"></view>
     <view class="tree tree-a"><view class="trunk"></view><view class="leaf leaf-1"></view><view class="leaf leaf-2"></view></view>
@@ -40,19 +43,19 @@
       </view>
       <view class="dial-inner">
         <text class="dial-label">今日可兑步数</text>
-        <text class="dial-number">6638</text>
-        <view class="dial-action">点击兑换</view>
+        <text class="dial-number">{{convertibleSteps}}</text>
+        <view class="dial-action {{convertibleSteps ? '' : 'is-disabled'}}" bindtap="onExchangeTap">{{exchanging ? '兑换中...' : '点击兑换'}}</view>
         <text class="dial-tip">每日零点清零</text>
       </view>
     </view>
-    <view class="sync">
+    <view class="sync" bindtap="onSyncTap">
       <view class="refresh">↻</view>
-      <text>同步最新步数</text>
+      <text>{{syncing ? '同步中...' : '同步最新步数'}}</text>
     </view>
   </view>
 
   <!-- 邀请胶囊 -->
-  <view class="invite-btn">邀请好友获得永久步数加成</view>
+  <button class="invite-btn" open-type="share">邀请好友获得永久步数加成</button>
 
   <!-- 好友助力卡 -->
   <view class="friend-card">
@@ -63,7 +66,7 @@
           <text>助力</text>
         </view>
         <view class="friend-adds">
-          <view class="add-plus" wx:for="{{adds}}" wx:key="*this">+</view>
+          <view class="add-plus" wx:for="{{adds}}" wx:key="*this" bindtap="onInviteHint">+</view>
         </view>
       </view>
       <view class="friend-stats">
@@ -71,7 +74,7 @@
         <text>当前步数加成0%，明天步数加成0%</text>
       </view>
     </view>
-    <view class="friend-more"><text>查看</text><text>更多›</text></view>
+    <view class="friend-more" bindtap="onFriendMore"><text>查看</text><text>更多›</text></view>
   </view>
 
   <!-- 每日兑换提醒 -->
@@ -80,16 +83,19 @@
       <view class="reminder-title">每日兑换提醒</view>
       <view class="reminder-sub">兑换券可兑换礼物，记得每天来看看哟~</view>
     </view>
-    <view class="switch"><view class="switch-knob"></view></view>
+    <view class="switch {{reminderOn ? 'switch-on' : ''}}" bindtap="onReminderToggle">
+      <view class="switch-knob"></view>
+    </view>
   </view>
 
   <!-- 步数挑战 -->
   <view class="challenge-card">
     <view class="challenge-head">
       <view class="challenge-bar"></view>
-      <text class="challenge-title">步数挑战</text>
-      <text class="challenge-date">2026-11-18开始</text>
-      <text class="challenge-more">更多›</text>
+      <text class="challenge-title">{{challenge ? challenge.title : '步数挑战'}}</text>
+      <text class="challenge-date" wx:if="{{challenge}}">{{challenge.startDate}}开始</text>
+      <text class="challenge-date" wx:else>活动即将开始</text>
+      <text class="challenge-more" bindtap="onChallengeMore">更多›</text>
     </view>
     <view class="challenge-body">
       <view class="runners">
@@ -112,11 +118,11 @@
         </view>
       </view>
       <view class="challenge-info">
-        <view class="goal">目标步数<text class="goal-num">12000</text>步</view>
-        <view class="deposit">挑战保证金0.00兑换券</view>
-        <view class="joined">已有309人参加</view>
+        <view class="goal">目标步数<text class="goal-num">{{challenge ? challenge.targetSteps : 0}}</text>步</view>
+        <view class="deposit">挑战保证金{{challenge ? challenge.depositCoupons : '0.00'}}兑换券</view>
+        <view class="joined">已有{{challenge ? challenge.participantCount : 0}}人参加</view>
       </view>
     </view>
-    <view class="challenge-btn">已参赛，邀请好友</view>
+    <button class="challenge-btn" open-type="share">已参赛，邀请好友</button>
   </view>
 </view>

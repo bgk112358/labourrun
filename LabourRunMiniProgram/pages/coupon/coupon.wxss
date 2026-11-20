@@ -1,0 +1,135 @@
+.page-coupon {
+  min-height: 100vh;
+  padding: 20rpx 30rpx 60rpx;
+  background: #F7F7F7;
+}
+
+.balance-card {
+  padding: 30rpx;
+  border-radius: 24rpx;
+  background: linear-gradient(135deg, #FFF6DE, #FFEAB8);
+}
+
+.balance-label {
+  color: #A9601B;
+  font-size: 26rpx;
+  font-weight: 600;
+}
+
+.balance-value {
+  margin-top: 12rpx;
+  color: #E93B33;
+  font-size: 64rpx;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.balance-unit {
+  margin-right: 6rpx;
+  font-size: 36rpx;
+}
+
+.balance-tip {
+  margin-top: 8rpx;
+  color: #A9601B;
+  font-size: 22rpx;
+  opacity: .75;
+}
+
+.ledger-list {
+  margin-top: 24rpx;
+  border-radius: 24rpx;
+  background: #FFFFFF;
+  overflow: hidden;
+}
+
+.ledger-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx 28rpx;
+  border-bottom: 1rpx solid #F0F0F0;
+}
+
+.ledger-item:last-child {
+  border-bottom: none;
+}
+
+.ledger-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.ledger-type {
+  color: #1A1A1A;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.ledger-time {
+  margin-top: 6rpx;
+  color: #999999;
+  font-size: 22rpx;
+}
+
+.ledger-right {
+  flex: none;
+  margin-left: 20rpx;
+  text-align: right;
+}
+
+.ledger-amount {
+  font-size: 32rpx;
+  font-weight: 700;
+}
+
+.ledger-amount.positive {
+  color: #E93B33;
+}
+
+.ledger-amount.negative {
+  color: #2F6DB5;
+}
+
+.ledger-balance {
+  margin-top: 6rpx;
+  color: #999999;
+  font-size: 22rpx;
+}
+
+.empty-tip {
+  margin-top: 24rpx;
+  padding: 60rpx 20rpx;
+  border-radius: 24rpx;
+  background: #FFFFFF;
+  color: #999999;
+  font-size: 24rpx;
+  text-align: center;
+}
+
+.load-more {
+  padding: 24rpx 0;
+  color: #999999;
+  font-size: 22rpx;
+  text-align: center;
+}
+
+.loading-tip,
+.error-bar {
+  margin-top: 16rpx;
+  padding: 14rpx 20rpx;
+  border-radius: 10rpx;
+  font-size: 24rpx;
+  text-align: center;
+}
+
+.loading-tip {
+  background: #FFFFFF;
+  color: #999999;
+}
+
+.error-bar {
+  background: #FFF1F0;
+  border: 1rpx solid #FFCCC7;
+  color: #E93B33;
+}

@@ -1,0 +1,33 @@
+<nav-bar title="兑换券明细" />
+<view class="page-coupon">
+  <view class="balance-card">
+    <view class="balance-label">我的兑换券</view>
+    <view class="balance-value"><text class="balance-unit">¥</text>{{balance}}</view>
+    <view class="balance-tip">步数兑换获得，可用于活动内兑换</view>
+  </view>
+
+  <view class="loading-tip" wx:if="{{loading}}">加载中...</view>
+  <view class="error-bar" wx:if="{{error}}" bindtap="onRetry">{{error}}，点击重试</view>
+
+  <view class="ledger-list" wx:if="{{list.length}}">
+    <view class="ledger-item" wx:for="{{list}}" wx:key="id">
+      <view class="ledger-left">
+        <view class="ledger-type">{{item.typeText}}</view>
+        <view class="ledger-time">{{item.timeText}}</view>
+      </view>
+      <view class="ledger-right">
+        <view class="ledger-amount {{item.positive ? 'positive' : 'negative'}}">
+          {{item.positive ? '+' : ''}}{{item.amount}}
+        </view>
+        <view class="ledger-balance">余额 {{item.balanceAfter}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty-tip" wx:if="{{!loading && !list.length}}">
+    暂无兑换券记录，去同步步数并兑换吧
+  </view>
+
+  <view class="load-more" wx:if="{{loadingMore}}">加载中...</view>
+  <view class="load-more" wx:if="{{finished && list.length}}">没有更多了</view>
+</view>
