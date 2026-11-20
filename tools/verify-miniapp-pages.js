@@ -5,6 +5,7 @@ const assert = require('assert');
 const path = require('path');
 
 const storage = Object.create(null);
+let pullDownStops = 0;
 
 function requestByNode(options) {
   const url = new URL(options.url);
@@ -90,6 +91,9 @@ global.wx = {
   },
   showLoading() {},
   hideLoading() {},
+  stopPullDownRefresh() {
+    pullDownStops += 1;
+  },
   showModal(options) {
     if (options.success) options.success({ confirm: true, cancel: false });
   },
@@ -171,6 +175,15 @@ async function main() {
   assert(indexPage.data.activity && indexPage.data.activity.noticeText);
   assert(indexPage.data.rules.length > 0);
 
+  const indexPullDownBefore = pullDownStops;
+  indexPage.onPullDownRefresh();
+  await waitFor(
+    () => pullDownStops > indexPullDownBefore && indexPage.data.loading === false,
+    'index pull down refresh'
+  );
+  assert(indexPage.data.error === '');
+  console.log('[ok] index pull down refresh');
+
   const phone = '138' + String(Date.now()).slice(-8);
   indexPage.onNameInput({ detail: { value: '页面验收' } });
   indexPage.onPhoneInput({ detail: { value: phone } });
@@ -208,6 +221,15 @@ async function main() {
   assert(stepsPage.data.challenge);
   assert(stepsPage.data.activityRules.length > 0);
 
+  const stepsPullDownBefore = pullDownStops;
+  stepsPage.onPullDownRefresh();
+  await waitFor(
+    () => pullDownStops > stepsPullDownBefore && stepsPage.data.loading === false,
+    'steps pull down refresh'
+  );
+  assert(stepsPage.data.error === '');
+  console.log('[ok] steps pull down refresh');
+
   stepsPage.onSyncTap();
   await waitFor(
     () => stepsPage.data.syncing === false && stepsPage.data.convertibleSteps === 6638,
@@ -241,6 +263,16 @@ async function main() {
   userPage.onLoad();
   userPage.onShow();
   await waitFor(() => userPage.data.loading === false, 'user load');
+
+  const userPullDownBefore = pullDownStops;
+  userPage.onPullDownRefresh();
+  await waitFor(
+    () => pullDownStops > userPullDownBefore && userPage.data.loading === false,
+    'user pull down refresh'
+  );
+  assert(userPage.data.error === '');
+  console.log('[ok] user pull down refresh');
+
   userPage.openNicknameEdit();
   userPage.onNicknameInput({ detail: { value: '页面昵称' } });
   userPage.saveNickname();

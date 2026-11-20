@@ -2,7 +2,15 @@
   "permissions": {
     "allow": [
       "Bash(pytest -q)",
-      "Bash(rg -n \"^#{1,3} \" /home/ubuntu/workspace/code-server/LabourRun/Docs/04-部署与使用.md)"
+      "Bash(rg -n \"^#{1,3} \" /home/ubuntu/workspace/code-server/LabourRun/Docs/04-部署与使用.md)",
+      "Bash(set -e)",
+      "Bash(node --check LabourRunMiniProgram/pages/index/index.js)",
+      "Bash(node --check LabourRunMiniProgram/pages/steps/steps.js)",
+      "Bash(node --check LabourRunMiniProgram/pages/user/user.js)",
+      "Bash(curl -fsS --max-time 3 http://127.0.0.1:3000/healthz)",
+      "Bash(curl -fsS --max-time 3 http://192.168.100.20:3000/healthz)",
+      "Bash(pwd; printf *)",
+      "Read(//tmp/**)"
     ]
   }
 }
