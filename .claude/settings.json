@@ -10,7 +10,9 @@
       "Bash(curl -fsS --max-time 3 http://127.0.0.1:3000/healthz)",
       "Bash(curl -fsS --max-time 3 http://192.168.100.20:3000/healthz)",
       "Bash(pwd; printf *)",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "Bash(node --check tools/verify-miniapp.js)",
+      "Bash(node --check tools/verify-miniapp-pages.js)"
     ]
   }
 }

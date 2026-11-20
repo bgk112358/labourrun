@@ -68,9 +68,17 @@ def seed(conn: sqlite3.Connection) -> None:
 
     conn.execute(
         "INSERT OR IGNORE INTO app_config(key, value) VALUES (?, ?)",
-        ("daily_cap_steps", "12000"),
+        ("daily_cap_steps", "10000"),
     )
     conn.execute(
         "INSERT OR IGNORE INTO app_config(key, value) VALUES (?, ?)",
         ("steps_per_coupon", "10000"),
+    )
+    # 旧库默认上限为 12000，按新规则迁移到 10000。
+    conn.execute(
+        """
+        UPDATE app_config
+        SET value = '10000'
+        WHERE key = 'daily_cap_steps' AND value = '12000'
+        """
     )

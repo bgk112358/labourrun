@@ -25,14 +25,13 @@ def build_step_summary(conn: sqlite3.Connection, user_id: str) -> dict[str, Any]
         (user_id, today),
     ).fetchone()
 
-    daily_cap = get_int_config(conn, "daily_cap_steps", 12000)
+    daily_cap = get_int_config(conn, "daily_cap_steps", 10000)
     steps_per_coupon = get_int_config(conn, "steps_per_coupon", 10000)
 
     steps = max(int(row["steps"]), 0) if row is not None else 0
     exchanged = max(int(row["exchanged_steps"]), 0) if row is not None else 0
-    available = max(steps - exchanged, 0)
-    remaining_cap = max(daily_cap - exchanged, 0)
-    convertible = min(available, remaining_cap)
+    max_exchangeable = min(steps, daily_cap)
+    convertible = max(max_exchangeable - exchanged, 0)
     coupon_cents = convertible * 100 // steps_per_coupon
 
     return {
@@ -206,35 +205,39 @@ def exchange_steps(
                     "暂无步数数据，请先同步步数",
                 )
 
-            daily_cap = get_int_config(conn, "daily_cap_steps", 12000)
+            daily_cap = get_int_config(conn, "daily_cap_steps", 10000)
             steps_per_coupon = get_int_config(conn, "steps_per_coupon", 10000)
 
             steps = max(int(step_row["steps"]), 0)
             exchanged = max(int(step_row["exchanged_steps"]), 0)
-            available = max(steps - exchanged, 0)
-            remaining_cap = max(daily_cap - exchanged, 0)
-            steps_to_exchange = min(available, remaining_cap)
+            max_exchangeable = min(steps, daily_cap)
+            convertible = max(max_exchangeable - exchanged, 0)
 
-            if steps_to_exchange <= 0:
-                if available <= 0:
+            if convertible <= 0:
+                if exchanged >= daily_cap:
                     raise AppError(
-                        ErrorCode.NO_CONVERTIBLE_STEPS,
+                        ErrorCode.DAILY_CAP_REACHED,
                         422,
-                        "暂无可兑换步数",
+                        "今日已达标",
                     )
                 raise AppError(
-                    ErrorCode.DAILY_CAP_REACHED,
+                    ErrorCode.NO_CONVERTIBLE_STEPS,
                     422,
-                    "已达到每日兑换上限",
+                    "暂无可兑换步数",
                 )
 
-            coupon_cents = steps_to_exchange * 100 // steps_per_coupon
+            coupon_cents = convertible * 100 // steps_per_coupon
             if coupon_cents <= 0:
                 raise AppError(
                     ErrorCode.EXCHANGE_AMOUNT_TOO_SMALL,
                     422,
-                    "可兑金额不足 0.01 兑换券",
+                    "不足 100 步，暂不可兑换",
                 )
+
+            steps_to_exchange = (
+                coupon_cents * steps_per_coupon // 100
+            )
+            steps_to_exchange = min(steps_to_exchange, convertible)
 
             now = utc_now_iso()
             conn.execute(

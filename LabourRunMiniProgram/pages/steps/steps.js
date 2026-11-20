@@ -11,6 +11,8 @@ Page({
     todaySteps: 0,
     convertibleSteps: 0,
     convertibleCoupons: '0.00',
+    dailyCapReached: false,
+    canExchange: false,
     challenge: null,
     activityRules: [],
     loading: true,
@@ -81,11 +83,16 @@ Page({
   applyStepsData(data) {
     const account = (data && data.couponAccount) || {};
     const summary = (data && data.stepSummary) || {};
+    const exchangedSteps = Number(summary.exchangedSteps || 0);
+    const dailyCapSteps = Number(summary.dailyCapSteps || 10000);
+    const convertibleCoupons = summary.convertibleCoupons || '0.00';
     const patch = {
       couponBalance: account.balance || '0.00',
       todaySteps: Number(summary.todaySteps || 0),
       convertibleSteps: Number(summary.convertibleSteps || 0),
-      convertibleCoupons: summary.convertibleCoupons || '0.00',
+      convertibleCoupons,
+      dailyCapReached: exchangedSteps >= dailyCapSteps,
+      canExchange: Number(convertibleCoupons) > 0,
     };
     if (data && data.challenge !== undefined) {
       patch.challenge = data.challenge;
@@ -199,17 +206,23 @@ Page({
 
   onExchangeTap() {
     if (this.data.exchanging) return;
+    if (this.data.dailyCapReached) {
+      ui.toast('今日已达标');
+      return;
+    }
     if (!this.data.convertibleSteps) {
       ui.toast('暂无可兑换步数');
+      return;
+    }
+    if (!this.data.canExchange) {
+      ui.toast('不足 100 步，暂不可兑换');
       return;
     }
     ui.confirm(
       '确认兑换',
       '确认兑换 ' +
-        this.data.convertibleSteps +
-        ' 步，获得 ' +
         this.data.convertibleCoupons +
-        ' 兑换券？'
+        ' 兑换券？未兑换步数会保留在今日可兑步数中。'
     ).then((confirmed) => {
       if (confirmed) this.doExchange();
     });

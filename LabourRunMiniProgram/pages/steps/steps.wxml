@@ -44,7 +44,7 @@
       <view class="dial-inner">
         <text class="dial-label">今日可兑步数</text>
         <text class="dial-number">{{convertibleSteps}}</text>
-        <view class="dial-action {{convertibleSteps ? '' : 'is-disabled'}}" bindtap="onExchangeTap">{{exchanging ? '兑换中...' : '点击兑换'}}</view>
+        <view class="dial-action {{convertibleSteps || dailyCapReached ? '' : 'is-disabled'}}" bindtap="onExchangeTap">{{exchanging ? '兑换中...' : '点击兑换'}}</view>
         <text class="dial-tip">每日零点清零</text>
       </view>
     </view>

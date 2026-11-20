@@ -6,6 +6,7 @@ const path = require('path');
 
 const storage = Object.create(null);
 let pullDownStops = 0;
+let lastToast = '';
 
 function requestByNode(options) {
   const url = new URL(options.url);
@@ -87,6 +88,7 @@ global.wx = {
     }
   },
   showToast(options) {
+    lastToast = options.title;
     console.log('[toast]', options.title);
   },
   showLoading() {},
@@ -243,7 +245,27 @@ async function main() {
     () => stepsPage.data.exchanging === false && stepsPage.data.couponBalance === '0.66',
     'steps exchange'
   );
-  assert(stepsPage.data.convertibleSteps === 0);
+  assert(stepsPage.data.convertibleSteps === 38);
+  assert(stepsPage.data.canExchange === false);
+  assert(stepsPage.data.dailyCapReached === false);
+
+  lastToast = '';
+  stepsPage.setData({
+    dailyCapReached: false,
+    canExchange: false,
+    convertibleSteps: 38,
+  });
+  stepsPage.onExchangeTap();
+  assert(lastToast === '不足 100 步，暂不可兑换');
+
+  lastToast = '';
+  stepsPage.setData({
+    dailyCapReached: true,
+    canExchange: false,
+    convertibleSteps: 0,
+  });
+  stepsPage.onExchangeTap();
+  assert(lastToast === '今日已达标');
   console.log('[ok] steps exchange', stepsPage.data.couponBalance);
 
   // 兑换券明细

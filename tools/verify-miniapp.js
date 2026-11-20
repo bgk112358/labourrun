@@ -163,9 +163,10 @@ async function main() {
 
   const requestId = 'verify-' + Date.now();
   const exchange = await api.exchangeSteps({ requestId });
-  assert(exchange.exchange.steps === 6638);
+  assert(exchange.exchange.steps === 6600);
   assert(exchange.exchange.couponAmount === '0.66');
   assert(exchange.couponAccount.balance === '0.66');
+  assert(exchange.stepSummary.convertibleSteps === 38);
   log('exchange', exchange.exchange.couponAmount);
 
   const repeated = await api.exchangeSteps({ requestId });

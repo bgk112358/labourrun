@@ -160,10 +160,11 @@ def test_steps_exchange_and_idempotency(client, login):
     assert exchanged.status_code == 200, exchanged.text
     exchange_data = exchanged.json()["data"]
     exchange_id = exchange_data["exchange"]["id"]
-    assert exchange_data["exchange"]["steps"] == 6638
+    assert exchange_data["exchange"]["steps"] == 6600
     assert exchange_data["exchange"]["couponAmount"] == "0.66"
     assert exchange_data["couponAccount"]["balance"] == "0.66"
-    assert exchange_data["stepSummary"]["convertibleSteps"] == 0
+    assert exchange_data["stepSummary"]["exchangedSteps"] == 6600
+    assert exchange_data["stepSummary"]["convertibleSteps"] == 38
 
     repeated = client.post(
         "/api/v1/steps/exchange",
@@ -174,21 +175,77 @@ def test_steps_exchange_and_idempotency(client, login):
     repeated_data = repeated.json()["data"]
     assert repeated_data["exchange"]["id"] == exchange_id
     assert repeated_data["couponAccount"]["balance"] == "0.66"
+    assert repeated_data["stepSummary"]["convertibleSteps"] == 38
 
     steps = client.get("/api/v1/steps", headers=headers)
     assert steps.status_code == 200
     step_data = steps.json()["data"]
-    assert step_data["stepSummary"]["exchangedSteps"] == 6638
-    assert step_data["stepSummary"]["convertibleSteps"] == 0
+    assert step_data["stepSummary"]["exchangedSteps"] == 6600
+    assert step_data["stepSummary"]["convertibleSteps"] == 38
     assert step_data["couponAccount"]["balance"] == "0.66"
 
-    no_more = client.post(
+    # 再同步到 6700 步，剩余 100 步可以再次兑换。
+    client.post(
+        "/api/v1/steps/sync",
+        headers=headers,
+        json={"mockSteps": 6700},
+    )
+    second = client.post(
         "/api/v1/steps/exchange",
         headers=headers,
         json={"requestId": "req-00000002"},
     )
+    assert second.status_code == 200, second.text
+    second_data = second.json()["data"]
+    assert second_data["exchange"]["steps"] == 100
+    assert second_data["exchange"]["couponAmount"] == "0.01"
+    assert second_data["couponAccount"]["balance"] == "0.67"
+    assert second_data["stepSummary"]["exchangedSteps"] == 6700
+    assert second_data["stepSummary"]["convertibleSteps"] == 0
+
+    no_more = client.post(
+        "/api/v1/steps/exchange",
+        headers=headers,
+        json={"requestId": "req-00000003"},
+    )
     assert no_more.status_code == 422
     assert no_more.json()["code"] == 3003
+
+
+def test_exchange_floor_and_remainder(client, login):
+    headers = login()
+    client.post(
+        "/api/v1/steps/sync",
+        headers=headers,
+        json={"mockSteps": 6650},
+    )
+
+    summary = client.get(
+        "/api/v1/steps", headers=headers
+    ).json()["data"]["stepSummary"]
+    assert summary["convertibleSteps"] == 6650
+    assert summary["convertibleCoupons"] == "0.66"
+
+    exchanged = client.post(
+        "/api/v1/steps/exchange",
+        headers=headers,
+        json={"requestId": "req-floor-0001"},
+    )
+    assert exchanged.status_code == 200, exchanged.text
+    data = exchanged.json()["data"]
+    assert data["exchange"]["steps"] == 6600
+    assert data["exchange"]["couponAmount"] == "0.66"
+    assert data["stepSummary"]["exchangedSteps"] == 6600
+    assert data["stepSummary"]["convertibleSteps"] == 50
+
+    too_small = client.post(
+        "/api/v1/steps/exchange",
+        headers=headers,
+        json={"requestId": "req-floor-0002"},
+    )
+    assert too_small.status_code == 422
+    assert too_small.json()["code"] == 3006
+    assert too_small.json()["message"] == "不足 100 步，暂不可兑换"
 
 
 def test_exchange_daily_cap(client, login):
@@ -202,8 +259,8 @@ def test_exchange_daily_cap(client, login):
     steps = client.get("/api/v1/steps", headers=headers)
     summary = steps.json()["data"]["stepSummary"]
     assert summary["todaySteps"] == 20000
-    assert summary["convertibleSteps"] == 12000
-    assert summary["convertibleCoupons"] == "1.20"
+    assert summary["convertibleSteps"] == 10000
+    assert summary["convertibleCoupons"] == "1.00"
 
     exchanged = client.post(
         "/api/v1/steps/exchange",
@@ -212,8 +269,8 @@ def test_exchange_daily_cap(client, login):
     )
     assert exchanged.status_code == 200, exchanged.text
     data = exchanged.json()["data"]
-    assert data["exchange"]["steps"] == 12000
-    assert data["exchange"]["couponAmount"] == "1.20"
+    assert data["exchange"]["steps"] == 10000
+    assert data["exchange"]["couponAmount"] == "1.00"
     assert data["stepSummary"]["convertibleSteps"] == 0
 
     cap_error = client.post(
@@ -223,6 +280,7 @@ def test_exchange_daily_cap(client, login):
     )
     assert cap_error.status_code == 422
     assert cap_error.json()["code"] == 3004
+    assert cap_error.json()["message"] == "今日已达标"
 
 
 def test_ledger(client, login):
