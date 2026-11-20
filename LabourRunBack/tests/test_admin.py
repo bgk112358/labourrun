@@ -1,9 +1,21 @@
 from __future__ import annotations
 
+from io import BytesIO
+from urllib.parse import urlparse
+
 import pytest
 
 from app.admin.service import create_admin
 from app.errors import AppError, ErrorCode
+
+
+def _png_bytes(width=1200, height=800, color=(47, 109, 181)):
+    from PIL import Image
+
+    image = Image.new("RGB", (width, height), color)
+    buffer = BytesIO()
+    image.save(buffer, format="PNG")
+    return buffer.getvalue()
 
 
 def test_admin_login_me_logout(client, admin_headers):
@@ -94,6 +106,76 @@ def test_activity_update_and_audit(client, admin_headers):
     detail_data = detail.json()["data"]
     assert detail_data["action"] == "update_activity"
     assert detail_data["before"]["noticeText"] != detail_data["after"]["noticeText"]
+
+
+def test_activity_image_upload_and_home(
+    client,
+    admin_headers,
+    login,
+):
+    pytest.importorskip("PIL")
+    headers = dict(admin_headers)
+    headers["Content-Type"] = "image/png"
+    uploaded = client.post(
+        "/api/v1/admin/activity/image",
+        headers=headers,
+        content=_png_bytes(),
+    )
+    assert uploaded.status_code == 200, uploaded.text
+    image = uploaded.json()["data"]
+    assert image["width"] == 750
+    assert image["height"] == 400
+    assert image["bytes"] > 0
+    assert image["imageUrl"].startswith(
+        "http://testserver/uploads/activity/"
+    )
+
+    path = urlparse(image["imageUrl"]).path
+    served = client.get(path)
+    assert served.status_code == 200
+    assert served.content.startswith(b"\xff\xd8\xff")
+
+    activity = client.get(
+        "/api/v1/admin/activity",
+        headers=admin_headers,
+    ).json()["data"]
+    payload = {
+        "name": activity["name"],
+        "noticeText": activity["noticeText"],
+        "rules": activity["rules"],
+        "startDate": activity["startDate"],
+        "endDate": activity["endDate"],
+        "status": activity["status"],
+        "imageUrl": image["imageUrl"],
+    }
+    updated = client.put(
+        "/api/v1/admin/activity",
+        headers=admin_headers,
+        json=payload,
+    )
+    assert updated.status_code == 200, updated.text
+    assert updated.json()["data"]["imageUrl"] == image["imageUrl"]
+
+    user_headers = login("mock:image-home")
+    home = client.get("/api/v1/home", headers=user_headers)
+    assert home.status_code == 200, home.text
+    assert (
+        home.json()["data"]["activity"]["imageUrl"]
+        == image["imageUrl"]
+    )
+
+
+def test_activity_image_rejects_invalid_file(client, admin_headers):
+    pytest.importorskip("PIL")
+    headers = dict(admin_headers)
+    headers["Content-Type"] = "image/png"
+    response = client.post(
+        "/api/v1/admin/activity/image",
+        headers=headers,
+        content=b"not-an-image",
+    )
+    assert response.status_code == 400
+    assert response.json()["code"] == 4000
 
 
 def test_challenge_update_and_deposit_conversion(client, admin_headers):

@@ -56,6 +56,7 @@ class ActivityAdminOut(APIModel):
     start_date: str | None = None
     end_date: str | None = None
     status: str
+    image_url: str | None = None
     updated_at: str
     updated_by: str | None = None
 
@@ -73,11 +74,27 @@ class ActivityAdminUpdate(APIModel):
         pattern=r"^\d{4}-\d{2}-\d{2}$",
     )
     status: ActivityStatus
+    image_url: str | None = Field(default=None, max_length=500)
 
     @field_validator("name", "notice_text", mode="before")
     @classmethod
     def strip_text(cls, value):
         return value.strip() if isinstance(value, str) else value
+
+    @field_validator("image_url", mode="before")
+    @classmethod
+    def normalize_image_url(cls, value):
+        if isinstance(value, str):
+            value = value.strip()
+            return value or None
+        return value
+
+
+class ActivityImageOut(APIModel):
+    image_url: str
+    width: int
+    height: int
+    bytes: int
 
 
 class ChallengeRule(APIModel):

@@ -15,6 +15,7 @@ Page({
     loading: true,
     submitting: false,
     error: '',
+    bannerError: false,
     submitText: '提交报名',
     statusText: '',
     isRegistered: false,
@@ -63,6 +64,7 @@ Page({
               form,
               loading: false,
               error: '',
+              bannerError: false,
             },
             state
           )
@@ -216,6 +218,10 @@ Page({
           ui.showError(error);
         });
     });
+  },
+
+  onBannerError() {
+    this.setData({ bannerError: true });
   },
 
   onRetry() {

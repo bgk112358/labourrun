@@ -15,6 +15,7 @@ from .deps import get_current_admin
 from .models import (
     ActivityAdminOut,
     ActivityAdminUpdate,
+    ActivityImageOut,
     AdminLoginData,
     AdminLoginRequest,
     AdminOut,
@@ -102,6 +103,22 @@ def update_activity(
     return ok(
         request,
         service.update_activity(settings, request, admin, body),
+    )
+
+
+@router.post(
+    "/activity/image",
+    response_model=ApiResponse[ActivityImageOut],
+)
+async def upload_activity_image(
+    request: Request,
+    admin: sqlite3.Row = Depends(get_current_admin),
+    settings: Settings = Depends(get_settings),
+):
+    content = await request.body()
+    return ok(
+        request,
+        service.process_activity_image(settings, content),
     )
 
 

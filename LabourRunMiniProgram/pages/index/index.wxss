@@ -35,6 +35,16 @@
   line-height: 40rpx;
 }
 
+/* 后台配置的活动主图 */
+.activity-banner {
+  display: block;
+  width: 690rpx;
+  height: 368rpx;
+  margin: 0 30rpx;
+  border-radius: 20rpx;
+  background: #D6E4F5;
+}
+
 /* 蓝色棋盘格区 */
 .board {
   position: relative;

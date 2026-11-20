@@ -43,6 +43,7 @@ class ActivityOut(APIModel):
     start_date: str | None = None
     end_date: str | None = None
     status: str
+    image_url: str | None = None
 
 
 class RegistrationOut(APIModel):

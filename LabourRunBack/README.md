@@ -16,6 +16,7 @@ LabourRun 微信小程序后端。实现内容以 `Docs/02-接口设计.md` 为�
 - 微信登录（真实 `code2Session` / 本地 mock）
 - JWT 鉴权
 - 首页活动配置 + 报名状态
+- 活动主图上传、自动居中裁剪/压缩、首页展示
 - 报名创建/修改/取消/取消后再次报名
 - 微信运动步数解密、同步、按日存储
 - 步数兑换兑换券（每日上限 12000 步，10000 步 = 1.00 兑换券，向下取整到分）
@@ -144,6 +145,10 @@ curl -s -X POST http://127.0.0.1:3000/api/v1/steps/exchange \
 | `ADMIN_JWT_SECRET` | 管理员 JWT 密钥，建议 32+ 字节 | 开发默认值 |
 | `ADMIN_JWT_TTL_SECONDS` | 管理员 token 有效期 | `28800` |
 | `ADMIN_ORIGINS` | 管理端跨域白名单，逗号分隔 | 本地 5173 |
+| `UPLOAD_DIR` | 上传文件目录 | `./uploads` |
+| `PUBLIC_BASE_URL` | 对外访问地址，用于生成图片 URL | `http://192.168.100.20:3000` |
+| `ACTIVITY_IMAGE_WIDTH` / `ACTIVITY_IMAGE_HEIGHT` | 活动图片目标尺寸 | `750` / `400` |
+| `ACTIVITY_IMAGE_QUALITY` | JPEG 初始质量 | `82` |
 
 ## 测试
 
@@ -151,7 +156,7 @@ curl -s -X POST http://127.0.0.1:3000/api/v1/steps/exchange \
 pytest -q
 ```
 
-当前：**25 passed**。
+当前：**27 passed**。
 
 ## 兑换规则
 

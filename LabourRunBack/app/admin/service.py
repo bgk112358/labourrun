@@ -7,7 +7,9 @@ import re
 import sqlite3
 from datetime import date
 from decimal import Decimal, InvalidOperation
+from pathlib import Path
 from typing import Any
+from uuid import uuid4
 
 from fastapi import Request
 
@@ -110,6 +112,7 @@ def _activity_admin(
         "start_date": row["start_date"],
         "end_date": row["end_date"],
         "status": row["status"],
+        "image_url": row["image_url"],
         "updated_at": row["updated_at"],
         "updated_by": _admin_username(conn, row["updated_by_admin_id"]),
     }
@@ -143,6 +146,7 @@ def _activity_snapshot(data: dict[str, Any]) -> dict[str, Any]:
         "startDate": data["start_date"],
         "endDate": data["end_date"],
         "status": data["status"],
+        "imageUrl": data["image_url"],
         "updatedAt": data["updated_at"],
         "updatedBy": data["updated_by"],
     }
@@ -263,6 +267,115 @@ def _mask_phone(phone: str) -> str:
     if len(phone) >= 7:
         return f"{phone[:3]}****{phone[-4:]}"
     return "****"
+
+
+def process_activity_image(
+    settings: Settings,
+    data: bytes,
+) -> dict[str, Any]:
+    try:
+        from PIL import Image, ImageOps, UnidentifiedImageError
+    except ImportError as exc:
+        raise AppError(
+            ErrorCode.CONFIG_ERROR,
+            500,
+            "服务端未安装 Pillow，无法处理活动图片",
+        ) from exc
+
+    if not data:
+        raise AppError(
+            ErrorCode.VALIDATION_ERROR,
+            400,
+            "图片内容为空",
+        )
+    if len(data) > settings.activity_image_max_upload_bytes:
+        raise AppError(
+            ErrorCode.VALIDATION_ERROR,
+            400,
+            "图片不能超过 10MB",
+        )
+
+    width = settings.activity_image_width
+    height = settings.activity_image_height
+    if width <= 0 or height <= 0:
+        raise AppError(
+            ErrorCode.CONFIG_ERROR,
+            500,
+            "活动图片尺寸配置无效",
+        )
+
+    try:
+        image = Image.open(io.BytesIO(data))
+        image.load()
+    except (UnidentifiedImageError, OSError, ValueError) as exc:
+        raise AppError(
+            ErrorCode.VALIDATION_ERROR,
+            400,
+            "不支持的图片格式",
+        ) from exc
+
+    try:
+        image = ImageOps.exif_transpose(image)
+        if image.mode in ("RGBA", "LA") or (
+            image.mode == "P" and "transparency" in image.info
+        ):
+            image = image.convert("RGBA")
+            background = Image.new("RGB", image.size, (255, 255, 255))
+            background.paste(image, mask=image.split()[-1])
+            image = background
+        else:
+            image = image.convert("RGB")
+
+        image = ImageOps.fit(
+            image,
+            (width, height),
+            method=Image.Resampling.LANCZOS,
+            centering=(0.5, 0.5),
+        )
+
+        quality = max(40, min(95, settings.activity_image_quality))
+        qualities = [quality]
+        for fallback in (75, 68, 60, 52, 45, 40):
+            if fallback not in qualities:
+                qualities.append(fallback)
+
+        output = b""
+        for current_quality in qualities:
+            buffer = io.BytesIO()
+            image.save(
+                buffer,
+                format="JPEG",
+                quality=current_quality,
+                optimize=True,
+                progressive=True,
+            )
+            output = buffer.getvalue()
+            if len(output) <= settings.activity_image_target_bytes:
+                break
+    except (OSError, ValueError) as exc:
+        raise AppError(
+            ErrorCode.VALIDATION_ERROR,
+            400,
+            "图片处理失败",
+        ) from exc
+
+    upload_dir = Path(settings.upload_dir) / "activity"
+    upload_dir.mkdir(parents=True, exist_ok=True)
+    filename = f"{uuid4().hex}.jpg"
+    (upload_dir / filename).write_bytes(output)
+
+    base_url = settings.public_base_url.rstrip("/")
+    image_url = (
+        f"{base_url}/uploads/activity/{filename}"
+        if base_url
+        else f"/uploads/activity/{filename}"
+    )
+    return {
+        "image_url": image_url,
+        "width": width,
+        "height": height,
+        "bytes": len(output),
+    }
 
 
 def _registration_where(
@@ -465,7 +578,7 @@ def update_activity(
             UPDATE activities
             SET name = ?, notice_text = ?, rules_json = ?,
                 start_date = ?, end_date = ?, status = ?,
-                updated_by_admin_id = ?, updated_at = ?
+                image_url = ?, updated_by_admin_id = ?, updated_at = ?
             WHERE id = ?
             """,
             (
@@ -475,6 +588,7 @@ def update_activity(
                 body.start_date,
                 body.end_date,
                 body.status,
+                body.image_url,
                 admin["id"],
                 now,
                 before_row["id"],

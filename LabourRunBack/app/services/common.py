@@ -50,6 +50,7 @@ def row_to_activity(row: sqlite3.Row) -> dict[str, Any]:
         "start_date": row["start_date"],
         "end_date": row["end_date"],
         "status": row["status"],
+        "image_url": row["image_url"],
     }
 
 

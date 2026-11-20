@@ -2,6 +2,7 @@ import type { AxiosResponse } from 'axios'
 import client from './client'
 import type {
   Activity,
+  ActivityImage,
   AdminInfo,
   AuditLogDetail,
   AuditLogItem,
@@ -38,6 +39,12 @@ export function getActivity(): Promise<Activity> {
 
 export function updateActivity(payload: any): Promise<Activity> {
   return client.put('/activity', payload) as any
+}
+
+export function uploadActivityImage(file: File): Promise<ActivityImage> {
+  return client.post('/activity/image', file, {
+    headers: { 'Content-Type': file.type || 'application/octet-stream' },
+  }) as any
 }
 
 export function getChallenge(): Promise<Challenge> {

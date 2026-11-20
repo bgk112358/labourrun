@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS activities (
     end_date TEXT,
     status TEXT NOT NULL DEFAULT 'ongoing'
         CHECK (status IN ('upcoming', 'ongoing', 'ended')),
+    image_url TEXT,
     updated_by_admin_id TEXT,
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL

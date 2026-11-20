@@ -2,11 +2,16 @@
 import { onMounted, reactive, ref } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getActivity, updateActivity } from '../api/admin'
+import {
+  getActivity,
+  updateActivity,
+  uploadActivityImage,
+} from '../api/admin'
 import type { Rule } from '../api/types'
 
 const loading = ref(false)
 const saving = ref(false)
+const uploading = ref(false)
 const dirty = ref(false)
 
 const form = reactive({
@@ -16,6 +21,7 @@ const form = reactive({
   startDate: '' as string | null,
   endDate: '' as string | null,
   status: 'ongoing',
+  imageUrl: '',
 })
 
 function markDirty() {
@@ -60,6 +66,7 @@ async function load() {
     form.startDate = data.startDate || ''
     form.endDate = data.endDate || ''
     form.status = data.status
+    form.imageUrl = data.imageUrl || ''
     dirty.value = false
   } catch (error: any) {
     ElMessage.error(error?.message || '加载活动配置失败')
@@ -115,6 +122,7 @@ async function save() {
       startDate: form.startDate || null,
       endDate: form.endDate || null,
       status: form.status,
+      imageUrl: form.imageUrl || null,
     })
     form.name = data.name
     form.noticeText = data.noticeText
@@ -125,6 +133,7 @@ async function save() {
     form.startDate = data.startDate || ''
     form.endDate = data.endDate || ''
     form.status = data.status
+    form.imageUrl = data.imageUrl || ''
     dirty.value = false
     ElMessage.success('活动配置已发布')
   } catch (error: any) {
@@ -132,6 +141,36 @@ async function save() {
   } finally {
     saving.value = false
   }
+}
+
+async function uploadImage(options: any) {
+  const file = options.file as File
+  if (!file) return
+  if (file.size > 10 * 1024 * 1024) {
+    const error = new Error('图片不能超过 10MB')
+    ElMessage.warning(error.message)
+    if (options.onError) options.onError(error)
+    return
+  }
+
+  uploading.value = true
+  try {
+    const data = await uploadActivityImage(file)
+    form.imageUrl = data.imageUrl
+    markDirty()
+    ElMessage.success('图片已上传，保存并发布后生效')
+    if (options.onSuccess) options.onSuccess(data)
+  } catch (error: any) {
+    ElMessage.error(error?.message || '图片上传失败')
+    if (options.onError) options.onError(error)
+  } finally {
+    uploading.value = false
+  }
+}
+
+function removeImage() {
+  form.imageUrl = ''
+  markDirty()
 }
 
 onBeforeRouteLeave(async () => {
@@ -183,6 +222,47 @@ onMounted(load)
                 show-word-limit
                 @input="markDirty"
               />
+            </el-form-item>
+
+            <el-form-item label="活动图片">
+              <div class="activity-image-field">
+                <el-image
+                  v-if="form.imageUrl"
+                  :src="form.imageUrl"
+                  fit="cover"
+                  class="activity-image-preview"
+                />
+                <div v-else class="activity-image-empty">
+                  首页主视觉
+                </div>
+                <div class="activity-image-actions">
+                  <el-upload
+                    action="#"
+                    :show-file-list="false"
+                    accept="image/*"
+                    :http-request="uploadImage"
+                  >
+                    <el-button
+                      type="primary"
+                      plain
+                      :loading="uploading"
+                    >
+                      上传活动图片
+                    </el-button>
+                  </el-upload>
+                  <el-button
+                    v-if="form.imageUrl"
+                    link
+                    type="danger"
+                    @click="removeImage"
+                  >
+                    移除图片
+                  </el-button>
+                </div>
+                <div class="muted">
+                  任意尺寸自动居中裁剪为 750×400，JPEG 压缩，尽量小于 200KB；最大 10MB。
+                </div>
+              </div>
             </el-form-item>
 
             <el-form-item label="活动时间">
@@ -281,6 +361,13 @@ onMounted(load)
             <span>★</span>
             {{ form.noticeText || '公告文案' }}
           </div>
+          <el-image
+            v-if="form.imageUrl"
+            :src="form.imageUrl"
+            fit="cover"
+            class="preview-banner"
+          />
+          <div v-else class="preview-board">活动须知</div>
           <div class="preview-rules">
             <div
               v-for="(rule, index) in form.rules"

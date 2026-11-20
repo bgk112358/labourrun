@@ -24,8 +24,16 @@ export interface Activity {
   startDate: string | null
   endDate: string | null
   status: string
+  imageUrl: string | null
   updatedAt: string
   updatedBy: string | null
+}
+
+export interface ActivityImage {
+  imageUrl: string
+  width: number
+  height: number
+  bytes: number
 }
 
 export interface ChallengeRule {

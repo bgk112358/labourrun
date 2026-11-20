@@ -76,6 +76,12 @@ def init_db(settings: Settings) -> None:
         _ensure_column(
             conn,
             "activities",
+            "image_url",
+            "TEXT",
+        )
+        _ensure_column(
+            conn,
+            "activities",
             "updated_by_admin_id",
             "TEXT",
         )

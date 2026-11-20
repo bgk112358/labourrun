@@ -12,6 +12,7 @@ from fastapi.responses import (
     JSONResponse,
     RedirectResponse,
 )
+from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from .admin.router import router as admin_router
@@ -156,6 +157,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         prefix=f"{prefix}/admin",
     )
     app.include_router(health.router)
+
+    upload_dir = Path(settings.upload_dir)
+    upload_dir.mkdir(parents=True, exist_ok=True)
+    app.mount(
+        "/uploads",
+        StaticFiles(directory=str(upload_dir)),
+        name="uploads",
+    )
 
     admin_dist = (
         Path(__file__).resolve().parents[2]

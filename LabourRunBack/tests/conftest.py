@@ -20,6 +20,11 @@ def settings(tmp_path) -> Settings:
         wx_secret="",
         wx_mock=True,
         log_level="error",
+        upload_dir=str(tmp_path / "uploads"),
+        public_base_url="http://testserver",
+        activity_image_width=750,
+        activity_image_height=400,
+        activity_image_quality=82,
     )
 
 

@@ -27,6 +27,13 @@ class Settings:
     admin_origins: str = (
         "http://localhost:5173,http://127.0.0.1:5173"
     )
+    upload_dir: str = "./uploads"
+    public_base_url: str = "http://192.168.100.20:3000"
+    activity_image_width: int = 750
+    activity_image_height: int = 400
+    activity_image_quality: int = 82
+    activity_image_max_upload_bytes: int = 10 * 1024 * 1024
+    activity_image_target_bytes: int = 200 * 1024
 
 
 def load_settings() -> Settings:
@@ -53,5 +60,19 @@ def load_settings() -> Settings:
         admin_origins=os.getenv(
             "ADMIN_ORIGINS",
             "http://localhost:5173,http://127.0.0.1:5173",
+        ),
+        upload_dir=os.getenv("UPLOAD_DIR", "./uploads"),
+        public_base_url=os.getenv(
+            "PUBLIC_BASE_URL",
+            "http://192.168.100.20:3000",
+        ),
+        activity_image_width=int(
+            os.getenv("ACTIVITY_IMAGE_WIDTH", "750")
+        ),
+        activity_image_height=int(
+            os.getenv("ACTIVITY_IMAGE_HEIGHT", "400")
+        ),
+        activity_image_quality=int(
+            os.getenv("ACTIVITY_IMAGE_QUALITY", "82")
         ),
     )

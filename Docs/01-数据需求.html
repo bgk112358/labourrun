@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LabourRun 小程序数据需求 v1.1</title>
+<title>LabourRun 小程序数据需求 v1.2</title>
 <style>
   :root {
     --ink: #1b2430;
@@ -41,7 +41,7 @@
       color: #8a96a6;
     }
     @top-right {
-      content: "v1.1";
+      content: "v1.2";
       font-size: 8pt;
       color: #8a96a6;
     }
@@ -367,14 +367,14 @@
     <h1 class="cover-title">数据需求说明</h1>
     <p class="cover-subtitle">步数挑战与兑换券小程序 · 前端界面数据梳理</p>
     <div class="cover-rule"></div>
-    <p class="cover-version">v1.1 <span>2026-11-17</span></p>
+    <p class="cover-version">v1.2 <span>2026-11-20</span></p>
 
     <table class="meta-table">
       <tbody>
         <tr><th>文档名称</th><td>数据需求说明</td></tr>
-        <tr><th>版本</th><td>v1.1</td></tr>
-        <tr><th>日期</th><td>2026-11-17</td></tr>
-        <tr><th>更新说明</th><td>每日提醒仅占位；挑战参赛流程占位；报名取消后可再次报名</td></tr>
+        <tr><th>版本</th><td>v1.2</td></tr>
+        <tr><th>日期</th><td>2026-11-20</td></tr>
+        <tr><th>更新说明</th><td>新增首页活动主图；同步小程序与后台已实现状态</td></tr>
         <tr><th>依据</th><td><code>LabourRunMiniProgram</code> 小程序界面（首页、步数宝、我）</td></tr>
         <tr><th>范围</th><td>数据来源、数据产生方/展示方、字段建议、呈现格式、刷新时机、后台推送</td></tr>
         <tr><th>不包含</th><td>视觉还原、页面功能细节、后台技术选型</td></tr>
@@ -385,7 +385,7 @@
       <div class="cover-note-title">阅读说明</div>
       <ul>
         <li>本文档基于初始版本的 <code>LabourRunMiniProgram</code> 界面整理；小程序接口接入与实现见 <code>Docs/02-接口设计.md</code> 和 <code>Docs/04-部署与使用.md</code>。</li>
-        <li><code>LabourRunBack</code> 尚未实现，文中字段名为建议值，供后台设计参考。</li>
+        <li><code>LabourRunBack</code> 已实现；本文档保留字段设计口径，实际接口以 <code>Docs/02-接口设计.md</code> 和 <code>Docs/03-后台管理设计.md</code> 为准。</li>
         <li>“占位”表示本期只保留界面或入口，不建立业务数据模型，不影响核心流程。</li>
         <li>“后台下发”指小程序调用接口获取；“后台推送”指后台主动通过微信能力触达用户。</li>
       </ul>
@@ -756,11 +756,19 @@
         </tr>
         <tr>
           <td>H-08</td>
-          <td>主视觉</td>
+          <td>活动主图 <code>imageUrl</code></td>
+          <td>后台活动配置/管理端上传</td>
+          <td>首页公告下方主图；后台自动居中裁剪为 750×400、JPEG 压缩</td>
+          <td>进入页面刷新；管理端保存后生效</td>
+          <td>核心（新增）</td>
+        </tr>
+        <tr>
+          <td>H-09</td>
+          <td>主视觉装饰</td>
           <td>静态</td>
-          <td>“活动须知”标牌、山/星/铅笔装饰</td>
+          <td>蓝色“活动须知”标牌、山/星/铅笔装饰；无图或图片加载失败时展示</td>
           <td>无</td>
-          <td>无业务数据</td>
+          <td>兜底</td>
         </tr>
       </tbody>
     </table>
@@ -1133,6 +1141,7 @@
         <tr><td><code>activityId</code></td><td>string</td><td>是</td><td>后台</td><td>活动 ID</td></tr>
         <tr><td><code>noticeText</code></td><td>string</td><td>否</td><td>后台</td><td>首页公告文案，如“延期：10月27日-12月27日”</td></tr>
         <tr><td><code>rules</code></td><td>json/text</td><td>是</td><td>后台</td><td>首页活动规则，建议有序数组</td></tr>
+        <tr><td><code>imageUrl</code></td><td>string</td><td>否</td><td>后台/管理端上传</td><td>首页活动主图地址；由后台裁剪压缩后返回</td></tr>
         <tr><td><code>startDate</code></td><td>date</td><td>否</td><td>后台</td><td>活动开始日期</td></tr>
         <tr><td><code>endDate</code></td><td>date</td><td>否</td><td>后台</td><td>活动结束日期</td></tr>
         <tr><td><code>status</code></td><td>enum</td><td>是</td><td>后台</td><td>未开始/进行中/已结束</td></tr>
@@ -1472,6 +1481,7 @@
       <tbody>
         <tr><td>v1.0</td><td>2026-11-17</td><td>根据 <code>LabourRunMiniProgram</code> 界面和用户确认结果整理初版</td></tr>
         <tr><td>v1.1</td><td>2026-11-17</td><td>每日提醒仅占位；挑战参赛流程占位；报名取消后可再次报名</td></tr>
+        <tr><td>v1.2</td><td>2026-11-20</td><td>新增首页活动主图 imageUrl；同步后台/小程序已实现状态</td></tr>
       </tbody>
     </table>
 
