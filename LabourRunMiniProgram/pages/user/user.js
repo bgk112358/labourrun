@@ -39,6 +39,7 @@ Page({
 
   onLoad() {
     this.requesting = false;
+    this.pending = null;
   },
 
   onShow() {
@@ -48,18 +49,29 @@ Page({
     this.loadMe();
   },
 
-  loadMe() {
-    if (this.requesting) return;
-    this.requesting = true;
-    this.setData({ loading: true, error: '' });
+  onPullDownRefresh() {
+    this.loadMe({ silent: true }).then(
+      () => wx.stopPullDownRefresh(),
+      () => wx.stopPullDownRefresh()
+    );
+  },
 
-    auth
+  loadMe(options) {
+    const silent = options && options.silent;
+    if (this.requesting) {
+      return this.pending || Promise.resolve();
+    }
+    this.requesting = true;
+    this.setData(silent ? { error: '' } : { loading: true, error: '' });
+
+    this.pending = auth
       .ensureLogin()
       .then(function () {
         return api.getMe();
       })
       .then((user) => {
         this.requesting = false;
+        this.pending = null;
         auth.updateUser(user);
         this.setData({
           user,
@@ -70,12 +82,14 @@ Page({
       })
       .catch((error) => {
         this.requesting = false;
+        this.pending = null;
         this.setData({
           loading: false,
           error: (error && error.message) || '加载失败',
         });
         ui.showError(error);
       });
+    return this.pending;
   },
 
   openNicknameEdit() {

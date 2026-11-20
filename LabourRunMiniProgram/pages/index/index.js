@@ -24,6 +24,7 @@ Page({
 
   onLoad() {
     this.requesting = false;
+    this.pending = null;
   },
 
   onShow() {
@@ -33,12 +34,22 @@ Page({
     this.loadData();
   },
 
-  loadData() {
-    if (this.requesting) return;
-    this.requesting = true;
-    this.setData({ loading: true, error: '' });
+  onPullDownRefresh() {
+    this.loadData({ silent: true }).then(
+      () => wx.stopPullDownRefresh(),
+      () => wx.stopPullDownRefresh()
+    );
+  },
 
-    auth
+  loadData(options) {
+    const silent = options && options.silent;
+    if (this.requesting) {
+      return this.pending || Promise.resolve();
+    }
+    this.requesting = true;
+    this.setData(silent ? { error: '' } : { loading: true, error: '' });
+
+    this.pending = auth
       .ensureLogin()
       .then(function () {
         return api.getHome();
@@ -55,6 +66,7 @@ Page({
           : { realName: '', phone: '', company: '' };
         const state = this.getRegistrationState(registration);
         this.requesting = false;
+        this.pending = null;
         this.setData(
           Object.assign(
             {
@@ -72,12 +84,14 @@ Page({
       })
       .catch((error) => {
         this.requesting = false;
+        this.pending = null;
         this.setData({
           loading: false,
           error: (error && error.message) || '加载失败',
         });
         ui.showError(error);
       });
+    return this.pending;
   },
 
   getRegistrationState(registration) {

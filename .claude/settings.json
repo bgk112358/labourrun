@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(pytest -q)"
+      "Bash(pytest -q)",
+      "Bash(rg -n \"^#{1,3} \" /home/ubuntu/workspace/code-server/LabourRun/Docs/04-部署与使用.md)"
     ]
   }
 }
