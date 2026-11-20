@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LabourRun 小程序数据需求 v1.1</title>
+<style>
+  :root {
+    --ink: #1b2430;
+    --muted: #64748b;
+    --line: #d6dee8;
+    --line-strong: #b8c5d3;
+    --accent: #b23a2e;
+    --accent-2: #2d567f;
+    --accent-soft: #fbf1ef;
+    --blue-soft: #eef4fa;
+    --paper: #ffffff;
+    --bg: #e8edf3;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Noto Sans CJK SC", "Source Han Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.7;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  @page {
+    size: A4;
+    margin: 17mm 15mm 18mm 15mm;
+    @top-left {
+      content: "LabourRun · 数据需求";
+      font-size: 8pt;
+      color: #8a96a6;
+    }
+    @top-right {
+      content: "v1.1";
+      font-size: 8pt;
+      color: #8a96a6;
+    }
+    @bottom-center {
+      content: "第 " counter(page) " 页 / 共 " counter(pages) " 页";
+      font-size: 8pt;
+      color: #8a96a6;
+    }
+  }
+
+  @page :first {
+    @top-left { content: ""; }
+    @top-right { content: ""; }
+    @bottom-center { content: ""; }
+  }
+
+  .print-btn {
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    z-index: 20;
+    border: 0;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #fff;
+    padding: 10px 18px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(178, 58, 46, 0.28);
+  }
+  .print-btn:hover { background: #963025; }
+
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 14mm auto;
+    padding: 18mm 16mm;
+    background: var(--paper);
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.14);
+  }
+
+  /* 封面 */
+  .cover {
+    min-height: 245mm;
+    display: flex;
+    flex-direction: column;
+  }
+  .brand {
+    color: var(--accent);
+    font-size: 9pt;
+    font-weight: 800;
+    letter-spacing: 2.4px;
+  }
+  .cover-kicker {
+    margin-top: 7mm;
+    color: var(--muted);
+    font-size: 9pt;
+    letter-spacing: 2.4px;
+  }
+  .cover-title {
+    margin: 4mm 0 3mm;
+    color: #16243a;
+    font-size: 30pt;
+    font-weight: 800;
+    letter-spacing: 2px;
+    line-height: 1.2;
+  }
+  .cover-subtitle {
+    margin: 0;
+    color: #526173;
+    font-size: 12pt;
+  }
+  .cover-rule {
+    width: 40mm;
+    height: 3px;
+    margin: 7mm 0 8mm;
+    background: var(--accent);
+  }
+  .cover-version {
+    margin: 0 0 8mm;
+    color: var(--accent);
+    font-size: 10pt;
+    font-weight: 700;
+  }
+  .cover-version span {
+    margin-left: 12px;
+    color: var(--muted);
+    font-weight: 400;
+  }
+  .meta-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9pt;
+  }
+  .meta-table th {
+    width: 24mm;
+    padding: 6px 8px 6px 0;
+    border-bottom: 1px solid #e2e8f0;
+    color: #64748b;
+    font-weight: 600;
+    text-align: left;
+    vertical-align: top;
+  }
+  .meta-table td {
+    padding: 6px 0;
+    border-bottom: 1px solid #e2e8f0;
+    color: #1f2937;
+    vertical-align: top;
+  }
+  .cover-note {
+    margin-top: 8mm;
+    padding: 5mm 6mm;
+    border: 1px solid #e2e8f0;
+    border-left: 3px solid var(--accent-2);
+    background: #f8fafc;
+  }
+  .cover-note-title {
+    margin-bottom: 5px;
+    color: var(--accent-2);
+    font-size: 9.5pt;
+    font-weight: 700;
+  }
+  .cover-note ul {
+    margin: 0;
+    padding-left: 1.5em;
+    color: #475569;
+    font-size: 9pt;
+  }
+  .cover-note li { margin: 3px 0; }
+  .cover-footer {
+    margin-top: auto;
+    padding-top: 10mm;
+    color: #94a3b8;
+    font-size: 8pt;
+    letter-spacing: 1px;
+  }
+
+  /* 目录 */
+  .toc { min-height: 245mm; }
+  .toc-head { margin-bottom: 12mm; }
+  .toc-title {
+    color: var(--accent-2);
+    font-size: 26pt;
+    font-weight: 800;
+    letter-spacing: 3px;
+  }
+  .toc-subtitle {
+    margin-top: 2px;
+    color: var(--muted);
+    font-size: 8.5pt;
+    letter-spacing: 3px;
+  }
+  .toc-columns {
+    column-count: 2;
+    column-gap: 12mm;
+  }
+  .toc-group {
+    break-inside: avoid;
+    margin: 0 0 10px;
+  }
+  .toc-group > a {
+    display: block;
+    margin-bottom: 3px;
+    color: var(--ink);
+    font-size: 10pt;
+    font-weight: 700;
+    text-decoration: none;
+  }
+  .toc-group > a .no {
+    margin-right: 6px;
+    color: var(--accent);
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  }
+  .toc-group ul {
+    margin: 0 0 0 16px;
+    padding: 0;
+    list-style: none;
+  }
+  .toc-group li {
+    margin: 2px 0;
+    font-size: 9pt;
+  }
+  .toc-group li a {
+    color: #4b5b6f;
+    text-decoration: none;
+  }
+  .toc-group a:hover { color: var(--accent); }
+
+  /* 正文 */
+  .content h2 {
+    margin: 0 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--accent-2);
+    color: var(--accent-2);
+    font-size: 17pt;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    line-height: 1.3;
+  }
+  .content h3 {
+    margin: 20px 0 8px;
+    padding-left: 9px;
+    border-left: 4px solid var(--accent);
+    color: #18283c;
+    font-size: 12.5pt;
+    line-height: 1.4;
+  }
+  .content h4 {
+    margin: 16px 0 6px;
+    color: #24364d;
+    font-size: 11pt;
+  }
+  p { margin: 7px 0 10px; }
+  ul, ol {
+    margin: 6px 0 12px;
+    padding-left: 1.7em;
+  }
+  li { margin: 3px 0; }
+  strong { color: #111b28; }
+  code {
+    padding: 0 3px;
+    border: 1px solid #e2e8f0;
+    border-radius: 3px;
+    background: #f1f5f9;
+    color: #334155;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 0.9em;
+    overflow-wrap: anywhere;
+  }
+  blockquote {
+    margin: 10px 0 14px;
+    padding: 9px 12px;
+    border-left: 4px solid var(--accent-2);
+    background: var(--blue-soft);
+    color: #3b4a5e;
+    font-size: 9.8pt;
+  }
+  blockquote p { margin: 0; }
+
+  table.table {
+    width: 100%;
+    margin: 8px 0 14px;
+    border-collapse: collapse;
+    table-layout: auto;
+    font-size: 8.7pt;
+    line-height: 1.55;
+    page-break-inside: auto;
+  }
+  table.table th {
+    padding: 6px 7px;
+    border: 1px solid var(--line-strong);
+    background: #e9f0f7;
+    color: #22364d;
+    font-weight: 700;
+    text-align: left;
+    vertical-align: top;
+  }
+  table.table td {
+    padding: 6px 7px;
+    border: 1px solid var(--line);
+    color: #263445;
+    vertical-align: top;
+  }
+  table.table tbody tr:nth-child(even) td { background: #fafbfd; }
+  table.table th,
+  table.table td {
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+  table.table tr { page-break-inside: avoid; }
+  table.table thead { display: table-header-group; }
+  table.table.compact { font-size: 8pt; }
+  table.table.compact th,
+  table.table.compact td { padding: 4px 5px; }
+
+  @media print {
+    body { background: #fff; }
+    .print-btn { display: none !important; }
+    .page {
+      width: auto;
+      min-height: 0;
+      margin: 0;
+      padding: 0;
+      box-shadow: none;
+    }
+    .cover, .toc {
+      min-height: 245mm;
+      page-break-after: always;
+    }
+    .content h2 { page-break-before: always; }
+    .content h2:first-of-type { page-break-before: auto; }
+    h2, h3, h4 { page-break-after: avoid; }
+    blockquote, .cover-note { page-break-inside: avoid; }
+    tr, li { page-break-inside: avoid; }
+    a { color: inherit; text-decoration: none; }
+  }
+
+  @media screen and (max-width: 900px) {
+    .page {
+      width: auto;
+      min-height: 0;
+      margin: 0;
+      padding: 18px;
+      box-shadow: none;
+    }
+    .cover, .toc { min-height: 0; }
+    .toc-columns { column-count: 1; }
+  }
+</style>
+</head>
+<body>
+<button class="print-btn" type="button" onclick="window.print()">打印 / 保存为 PDF</button>
+
+<main class="page">
+
+  <!-- 封面 -->
+  <section class="cover">
+    <div class="brand">LABOURRUN · 微信小程序</div>
+    <div class="cover-kicker">01 / DATA REQUIREMENTS</div>
+    <h1 class="cover-title">数据需求说明</h1>
+    <p class="cover-subtitle">步数挑战与兑换券小程序 · 前端界面数据梳理</p>
+    <div class="cover-rule"></div>
+    <p class="cover-version">v1.1 <span>2026-11-17</span></p>
+
+    <table class="meta-table">
+      <tbody>
+        <tr><th>文档名称</th><td>数据需求说明</td></tr>
+        <tr><th>版本</th><td>v1.1</td></tr>
+        <tr><th>日期</th><td>2026-11-17</td></tr>
+        <tr><th>更新说明</th><td>每日提醒仅占位；挑战参赛流程占位；报名取消后可再次报名</td></tr>
+        <tr><th>依据</th><td><code>LabourRunfront</code> 小程序界面（首页、步数宝、我）</td></tr>
+        <tr><th>范围</th><td>数据来源、数据产生方/展示方、字段建议、呈现格式、刷新时机、后台推送</td></tr>
+        <tr><th>不包含</th><td>视觉还原、页面功能细节、后台技术选型</td></tr>
+      </tbody>
+    </table>
+
+    <div class="cover-note">
+      <div class="cover-note-title">阅读说明</div>
+      <ul>
+        <li><code>LabourRunfront</code> 目前只有界面，没有接口调用；本文档不修改前端代码。</li>
+        <li><code>LabourRunBack</code> 尚未实现，文中字段名为建议值，供后台设计参考。</li>
+        <li>“占位”表示本期只保留界面或入口，不建立业务数据模型，不影响核心流程。</li>
+        <li>“后台下发”指小程序调用接口获取；“后台推送”指后台主动通过微信能力触达用户。</li>
+      </ul>
+    </div>
+
+    <div class="cover-footer">内部资料 · 供产品、前端、后端评审使用</div>
+  </section>
+
+  <!-- 目录 -->
+  <section class="toc">
+    <div class="toc-head">
+      <div class="toc-title">目录</div>
+      <div class="toc-subtitle">CONTENTS</div>
+    </div>
+    <div class="toc-columns">
+      <div class="toc-group">
+        <a href="#section-1"><span class="no">01</span>范围与结论</a>
+        <ul>
+          <li><a href="#section-1-1">1.1 本期核心数据</a></li>
+          <li><a href="#section-1-2">1.2 本期占位</a></li>
+          <li><a href="#section-1-3">1.3 数据流总原则</a></li>
+        </ul>
+      </div>
+      <div class="toc-group">
+        <a href="#section-2"><span class="no">02</span>数据来源分类</a>
+        <ul>
+          <li><a href="#section-2-1">2.1 用户手动输入</a></li>
+          <li><a href="#section-2-2">2.2 微信/手机能力获取</a></li>
+          <li><a href="#section-2-3">2.3 后台接口下发</a></li>
+          <li><a href="#section-2-4">2.4 后台主动推送（本期仅占位）</a></li>
+          <li><a href="#section-2-5">2.5 本地缓存与前端数据</a></li>
+        </ul>
+      </div>
+      <div class="toc-group">
+        <a href="#section-3"><span class="no">03</span>页面数据清单</a>
+        <ul>
+          <li><a href="#section-3-1">3.1 首页</a></li>
+          <li><a href="#section-3-2">3.2 步数宝</a></li>
+          <li><a href="#section-3-3">3.3 我</a></li>
+        </ul>
+      </div>
+      <div class="toc-group">
+        <a href="#section-4"><span class="no">04</span>核心数据实体与字段建议</a>
+        <ul>
+          <li><a href="#section-4-1">4.1 用户 User</a></li>
+          <li><a href="#section-4-2">4.2 报名 Registration</a></li>
+          <li><a href="#section-4-3">4.3 活动配置 ActivityConfig</a></li>
+          <li><a href="#section-4-4">4.4 每日步数 DailyStep</a></li>
+          <li><a href="#section-4-5">4.5 兑换记录 ExchangeRecord</a></li>
+          <li><a href="#section-4-6">4.6 兑换券账户与流水</a></li>
+          <li><a href="#section-4-7">4.7 步数挑战</a></li>
+          <li><a href="#section-4-8">4.8 每日提醒 Reminder（占位）</a></li>
+        </ul>
+      </div>
+      <div class="toc-group">
+        <a href="#section-5"><span class="no">05</span>数据流与责任矩阵</a>
+        <ul>
+          <li><a href="#section-5-1">5.1 核心/占位数据责任</a></li>
+          <li><a href="#section-5-2">5.2 “我”页 11 个菜单项数据流向</a></li>
+          <li><a href="#section-5-3">5.3 其他占位资产入口</a></li>
+        </ul>
+      </div>
+      <div class="toc-group">
+        <a href="#section-6"><span class="no">06</span>呈现与格式约定</a>
+        <ul>
+          <li><a href="#section-6-1">6.1 数值与文本格式</a></li>
+          <li><a href="#section-6-2">6.2 表单与按钮状态</a></li>
+          <li><a href="#section-6-3">6.3 空状态与异常状态</a></li>
+          <li><a href="#section-6-4">6.4 刷新时机</a></li>
+        </ul>
+      </div>
+      <div class="toc-group">
+        <a href="#section-7"><span class="no">07</span>校验、异常与隐私</a>
+        <ul>
+          <li><a href="#section-7-1">7.1 报名校验</a></li>
+          <li><a href="#section-7-2">7.2 步数与兑换异常</a></li>
+          <li><a href="#section-7-3">7.3 隐私与合规建议</a></li>
+        </ul>
+      </div>
+      <div class="toc-group">
+        <a href="#section-8"><span class="no">08</span>后台推送（本期仅占位）</a>
+        <ul>
+          <li><a href="#section-8-1">8.1 每日兑换提醒</a></li>
+          <li><a href="#section-8-2">8.2 推送数据建议字段</a></li>
+        </ul>
+      </div>
+      <div class="toc-group">
+        <a href="#section-9"><span class="no">09</span>已确认事项与待确认项</a>
+        <ul>
+          <li><a href="#section-9-1">9.1 已确认</a></li>
+          <li><a href="#section-9-2">9.2 仍待确认</a></li>
+        </ul>
+      </div>
+      <div class="toc-group">
+        <a href="#section-10"><span class="no">10</span>变更记录</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 正文 -->
+  <div class="content">
+
+    <h2 id="section-1">1. 范围与结论</h2>
+
+    <h3 id="section-1-1">1.1 本期核心数据</h3>
+    <ol>
+      <li>用户身份（微信登录）。</li>
+      <li>参赛报名（姓名、电话、工作单位）。</li>
+      <li>微信运动步数同步。</li>
+      <li>步数兑换兑换券。</li>
+      <li>兑换券余额。</li>
+      <li>步数挑战展示（配置、规则）。</li>
+      <li>用户头像与昵称。</li>
+    </ol>
+
+    <h3 id="section-1-2">1.2 本期占位</h3>
+    <ul>
+      <li>商城类：我的订单、积分、优惠券、卡券、收货地址、领券中心、分类、分销中心、我的收藏、我的足迹。</li>
+      <li>社交类：排行榜、邀请/助力规则及加成。</li>
+      <li>提醒类：每日兑换提醒开关及后台推送（仅占位）。</li>
+      <li>定位图标。</li>
+      <li>“我”页 11 个菜单项的目标页：只梳理数据走向，不实现功能。</li>
+    </ul>
+
+    <h3 id="section-1-3">1.3 数据流总原则</h3>
+    <ul>
+      <li><strong>用户输入</strong>：由用户产生，前端收集并校验，后台存储。</li>
+      <li><strong>微信能力</strong>：由微信产生，前端获取，后台解密或存储。</li>
+      <li><strong>业务数据</strong>：由后台产生，前端只负责展示。</li>
+      <li><strong>后台推送</strong>：由后台产生并发送，经微信服务通知触达用户。</li>
+      <li>前端不自行造业务数据；占位数据统一展示默认值（0、0%、0.00）。</li>
+    </ul>
+
+    <h2 id="section-2">2. 数据来源分类</h2>
+
+    <h3 id="section-2-1">2.1 用户手动输入</h3>
+    <table class="table">
+      <thead>
+        <tr><th>数据项</th><th>页面</th><th>输入方式</th><th>去向</th><th>本期状态</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>姓名</td><td>首页</td><td>文本输入，必填</td><td>报名接口 → 后台</td><td>核心</td></tr>
+        <tr><td>电话</td><td>首页</td><td>文本/数字输入，必填，11 位</td><td>报名接口 → 后台</td><td>核心</td></tr>
+        <tr><td>工作单位</td><td>首页</td><td>文本输入，必填</td><td>报名接口 → 后台</td><td>核心</td></tr>
+        <tr><td>头像</td><td>我</td><td><code>button open-type="chooseAvatar"</code></td><td>资料接口 → 后台</td><td>核心</td></tr>
+        <tr><td>昵称</td><td>我</td><td><code>input type="nickname"</code></td><td>资料接口 → 后台</td><td>核心</td></tr>
+        <tr><td>收货人/地址</td><td>地址页</td><td>手动输入或微信地址</td><td>地址接口 → 后台</td><td>占位</td></tr>
+      </tbody>
+    </table>
+    <p>说明：本期报名电话为手动输入，<strong>不需要短信验证码</strong>。</p>
+
+    <h3 id="section-2-2">2.2 微信/手机能力获取</h3>
+    <table class="table compact">
+      <thead>
+        <tr><th>能力</th><th>接口/方式</th><th>产生数据</th><th>用途</th><th>前置条件</th><th>本期状态</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>登录身份</td>
+          <td><code>wx.login</code> → code → 后台 <code>code2Session</code></td>
+          <td>openid、session_key</td>
+          <td>用户身份、所有用户数据的前提</td>
+          <td>无</td>
+          <td>核心</td>
+        </tr>
+        <tr>
+          <td>微信运动步数</td>
+          <td><code>wx.getWeRunData</code> → encryptedData/iv → 后台解密</td>
+          <td>当日及历史步数</td>
+          <td>步数同步、兑换券兑换</td>
+          <td>用户授权“微信运动”，且已开启微信运动</td>
+          <td>核心</td>
+        </tr>
+        <tr>
+          <td>头像</td>
+          <td><code>button open-type="chooseAvatar"</code></td>
+          <td>临时头像文件</td>
+          <td>用户头像</td>
+          <td>用户点击选择</td>
+          <td>核心</td>
+        </tr>
+        <tr>
+          <td>昵称</td>
+          <td><code>input type="nickname"</code></td>
+          <td>昵称文本</td>
+          <td>用户昵称</td>
+          <td>用户填写</td>
+          <td>核心</td>
+        </tr>
+        <tr>
+          <td>手机号</td>
+          <td><code>button open-type="getPhoneNumber"</code></td>
+          <td>手机号 code/加密数据</td>
+          <td>绑定手机号</td>
+          <td>企业认证；用户点击授权</td>
+          <td>占位</td>
+        </tr>
+        <tr>
+          <td>收货地址</td>
+          <td><code>wx.chooseAddress</code></td>
+          <td>收货人、电话、地址</td>
+          <td>收货地址</td>
+          <td><code>scope.address</code> 授权</td>
+          <td>占位</td>
+        </tr>
+        <tr>
+          <td>定位</td>
+          <td><code>wx.getLocation</code> / <code>wx.chooseLocation</code></td>
+          <td>经纬度/城市</td>
+          <td>定位图标</td>
+          <td>隐私声明、用户授权</td>
+          <td>占位</td>
+        </tr>
+        <tr>
+          <td>订阅消息</td>
+          <td><code>wx.requestSubscribeMessage</code></td>
+          <td>订阅授权结果</td>
+          <td>每日兑换提醒</td>
+          <td>用户点击；模板待配置</td>
+          <td>占位</td>
+        </tr>
+        <tr>
+          <td>分享邀请</td>
+          <td><code>onShareAppMessage</code> + 邀请参数</td>
+          <td>分享路径、邀请关系</td>
+          <td>邀请好友</td>
+          <td>用户点击分享</td>
+          <td>占位</td>
+        </tr>
+        <tr>
+          <td>客服</td>
+          <td><code>button open-type="contact"</code></td>
+          <td>客服会话</td>
+          <td>联系客服</td>
+          <td>小程序后台配置客服</td>
+          <td>占位</td>
+        </tr>
+        <tr>
+          <td>系统信息</td>
+          <td><code>wx.getWindowInfo</code> / <code>wx.getSystemInfoSync</code></td>
+          <td>状态栏、安全区尺寸</td>
+          <td>页面布局</td>
+          <td>无</td>
+          <td>核心（仅 UI）</td>
+        </tr>
+      </tbody>
+    </table>
+    <p><strong>注意：</strong></p>
+    <ul>
+      <li><code>wx.getWeRunData</code> 返回的是加密数据，必须由后台使用 <code>session_key</code> 解密，前端不能直接解析。</li>
+      <li>头像、昵称不能静默获取，必须由用户通过 <code>chooseAvatar</code> 和 <code>nickname</code> 输入产生。</li>
+      <li>若用户未授权微信运动、未开启微信运动或系统限制运动数据，步数可能为 0。</li>
+    </ul>
+
+    <h3 id="section-2-3">2.3 后台接口下发</h3>
+    <table class="table">
+      <thead>
+        <tr><th>数据域</th><th>内容</th><th>本期状态</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>活动配置</td><td>公告文案、活动规则、活动起止时间</td><td>核心</td></tr>
+        <tr><td>用户资料</td><td>头像、昵称、绑定手机号</td><td>核心（手机号占位）</td></tr>
+        <tr><td>报名数据</td><td>报名记录、报名状态</td><td>核心</td></tr>
+        <tr><td>步数数据</td><td>今日步数、可兑步数、最后同步时间</td><td>核心</td></tr>
+        <tr><td>兑换券</td><td>余额、兑换记录</td><td>核心</td></tr>
+        <tr><td>步数挑战</td><td>开始日期、目标步数、保证金、参与人数、详细规则</td><td>核心（仅展示配置）</td></tr>
+        <tr><td>挑战参与状态</td><td>是否已参赛、参赛记录</td><td>占位</td></tr>
+        <tr><td>排行榜</td><td>排名、用户、步数/兑换券数</td><td>占位</td></tr>
+        <tr><td>邀请/助力</td><td>邀请人数、加成比例、好友列表</td><td>占位</td></tr>
+        <tr><td>商城/资产</td><td>订单、积分、优惠券、卡券、收藏、足迹</td><td>占位</td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="section-2-4">2.4 后台主动推送（本期仅占位）</h3>
+    <table class="table">
+      <thead>
+        <tr><th>推送场景</th><th>触发方</th><th>通道</th><th>内容</th><th>本期状态</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>每日兑换提醒</td>
+          <td>后台定时任务（预留）</td>
+          <td>微信订阅消息（预留）</td>
+          <td>提醒用户进入步数宝兑换</td>
+          <td>占位（不实现推送）</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>其他推送场景（挑战开始/结束、奖励到账、订单发货、客服回复）UI 未体现，本期不做。</p>
+
+    <h3 id="section-2-5">2.5 本地缓存与前端数据</h3>
+    <table class="table">
+      <thead>
+        <tr><th>数据项</th><th>存储位置</th><th>用途</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>登录 token</td><td>本地缓存</td><td>接口鉴权</td><td>清除缓存时不能清除登录态</td></tr>
+        <tr><td>用户资料缓存</td><td>本地缓存</td><td>首屏展示</td><td>以后台数据为准</td></tr>
+        <tr><td>每日提醒开关状态</td><td>本地/后台</td><td>UI 展示</td><td>本期占位，不产生订阅状态</td></tr>
+        <tr><td>最后同步时间</td><td>本地缓存</td><td>辅助展示/刷新</td><td>UI 目前未展示</td></tr>
+        <tr><td>状态栏/安全区尺寸</td><td>全局数据</td><td>布局适配</td><td>无业务含义</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="section-3">3. 页面数据清单</h2>
+
+    <h3 id="section-3-1">3.1 首页</h3>
+    <table class="table compact">
+      <thead>
+        <tr><th>编号</th><th>数据项（建议字段）</th><th>来源/产生方</th><th>展示位置与方式</th><th>刷新/交互</th><th>本期状态</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>H-01</td>
+          <td>活动公告 <code>noticeText</code></td>
+          <td>后台活动配置</td>
+          <td>顶部信息条：星标 + 红色单行文本，当前文案“延期：10月27日-12月27日”</td>
+          <td>进入页面刷新</td>
+          <td>核心</td>
+        </tr>
+        <tr>
+          <td>H-02</td>
+          <td>活动规则 <code>rules[]</code></td>
+          <td>后台配置</td>
+          <td>规则卡：01–04 圆形序号 + 多行文本</td>
+          <td>进入页面刷新</td>
+          <td>核心</td>
+        </tr>
+        <tr>
+          <td>H-03</td>
+          <td>姓名 <code>realName</code></td>
+          <td>用户输入</td>
+          <td>报名表单行，必填红星，placeholder“请输入姓名”</td>
+          <td>提交/修改时校验</td>
+          <td>核心</td>
+        </tr>
+        <tr>
+          <td>H-04</td>
+          <td>电话 <code>phone</code></td>
+          <td>用户输入</td>
+          <td>报名表单行，必填，右侧“11位”提示</td>
+          <td>提交/修改时校验</td>
+          <td>核心</td>
+        </tr>
+        <tr>
+          <td>H-05</td>
+          <td>工作单位 <code>company</code></td>
+          <td>用户输入</td>
+          <td>报名表单行，必填，placeholder“请输入工作单位”</td>
+          <td>提交/修改时校验</td>
+          <td>核心</td>
+        </tr>
+        <tr>
+          <td>H-06</td>
+          <td>报名记录与状态 <code>registration</code></td>
+          <td>用户提交 → 后台</td>
+          <td>已报名时回填表单；展示“已报名/已取消”状态</td>
+          <td>提交、修改、取消后刷新</td>
+          <td>核心</td>
+        </tr>
+        <tr>
+          <td>H-07</td>
+          <td>报名提交入口</td>
+          <td>前端交互</td>
+          <td><strong>底部固定按钮</strong>：提交报名 / 保存修改；取消报名为独立操作</td>
+          <td>点击提交、保存、取消</td>
+          <td>核心（UI 需补）</td>
+        </tr>
+        <tr>
+          <td>H-08</td>
+          <td>主视觉</td>
+          <td>静态</td>
+          <td>“活动须知”标牌、山/星/铅笔装饰</td>
+          <td>无</td>
+          <td>无业务数据</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h4>报名数据规则</h4>
+    <ul>
+      <li>一个用户（openid）在同一活动内只能有一条有效报名记录。</li>
+      <li>一个手机号在同一活动内同一时间只能有一条有效报名记录。</li>
+      <li>允许修改报名信息，修改时重新校验手机号唯一性。</li>
+      <li>允许取消报名；取消后保留原记录并将状态置为“已取消”，不做物理删除。</li>
+      <li>取消后允许再次报名；再次报名时复用原记录并恢复为“已报名”，同一时间同一用户/手机号只能有一条有效报名记录。</li>
+      <li>不发送短信验证码，电话仅做格式校验和唯一性校验。</li>
+      <li>报名成功后按钮变为“保存修改”，并展示“已报名”状态；取消报名需二次确认。</li>
+    </ul>
+
+    <h3 id="section-3-2">3.2 步数宝</h3>
+    <table class="table compact">
+      <thead>
+        <tr><th>编号</th><th>数据项（建议字段）</th><th>来源/产生方</th><th>展示位置与方式</th><th>刷新/交互</th><th>本期状态</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>S-01</td>
+          <td>兑换券余额 <code>couponBalance</code></td>
+          <td>后台用户资产</td>
+          <td>顶部白条：金币图标 +“我的兑换券”+ 数值（2 位小数，如 19.00）+ 右箭头</td>
+          <td>onShow、兑换后刷新；点击进明细（明细页待设计）</td>
+          <td>核心</td>
+        </tr>
+        <tr>
+          <td>S-02</td>
+          <td>今日可兑步数 <code>convertibleSteps</code></td>
+          <td>后台（基于微信运动步数计算）</td>
+          <td>表盘中央红色大号数字，如 6638</td>
+          <td>进入页面、同步、兑换后刷新</td>
+          <td>核心</td>
+        </tr>
+        <tr>
+          <td>S-03</td>
+          <td>步数同步 <code>syncSteps</code></td>
+          <td>微信 <code>wx.getWeRunData</code> → 后台解密</td>
+          <td>表盘下方“↻ 同步最新步数”</td>
+          <td>用户点击触发授权/同步</td>
+          <td>核心</td>
+        </tr>
+        <tr>
+          <td>S-04</td>
+          <td>兑换动作 <code>exchange</code></td>
+          <td>用户操作 + 后台</td>
+          <td>表盘“点击兑换”按钮</td>
+          <td>点击兑换，成功后刷新余额和可兑步数</td>
+          <td>核心</td>
+        </tr>
+        <tr>
+          <td>S-05</td>
+          <td>每日兑换上限</td>
+          <td>后台配置</td>
+          <td>规则说明；每日上限 <strong>12000</strong>（默认按步数计，见待确认）</td>
+          <td>兑换时校验</td>
+          <td>核心</td>
+        </tr>
+        <tr>
+          <td>S-06</td>
+          <td>每日清零规则</td>
+          <td>后台规则/定时任务</td>
+          <td>表盘下方“每日零点清零”</td>
+          <td>每日 00:00 服务端重置未兑换步数</td>
+          <td>核心</td>
+        </tr>
+        <tr>
+          <td>S-07</td>
+          <td>排行榜</td>
+          <td>后台</td>
+          <td>左上奖杯 +“排行榜”入口</td>
+          <td>点击进入榜单页（页面未设计）</td>
+          <td>占位</td>
+        </tr>
+        <tr>
+          <td>S-08</td>
+          <td>规则入口</td>
+          <td>后台配置</td>
+          <td>右上“规则”胶囊</td>
+          <td>点击查看规则</td>
+          <td>核心（入口）</td>
+        </tr>
+        <tr>
+          <td>S-09</td>
+          <td>邀请入口</td>
+          <td>微信分享 + 后台</td>
+          <td>金色胶囊“邀请好友获得永久步数加成”</td>
+          <td>点击分享</td>
+          <td>占位（规则占位）</td>
+        </tr>
+        <tr>
+          <td>S-10</td>
+          <td>邀请统计</td>
+          <td>后台/静态默认值</td>
+          <td>“总邀请0人，今日邀请0人”</td>
+          <td>onShow 刷新</td>
+          <td>占位</td>
+        </tr>
+        <tr>
+          <td>S-11</td>
+          <td>步数加成</td>
+          <td>后台/静态默认值</td>
+          <td>“当前步数加成0%，明天步数加成0%”</td>
+          <td>onShow 刷新</td>
+          <td>占位</td>
+        </tr>
+        <tr>
+          <td>S-12</td>
+          <td>助力好友位</td>
+          <td>后台/静态默认值</td>
+          <td>好友助力卡内 4 个“+”方格</td>
+          <td>点击邀请/助力</td>
+          <td>占位</td>
+        </tr>
+        <tr>
+          <td>S-13</td>
+          <td>每日兑换提醒开关</td>
+          <td>前端 UI（占位）</td>
+          <td>开关组件，当前默认关闭；副文案“兑换券可兑换礼物，记得每天来看看哟~”</td>
+          <td>仅 UI 展示，不请求订阅、不保存状态</td>
+          <td>占位（开关与推送均不实现）</td>
+        </tr>
+        <tr>
+          <td>S-14</td>
+          <td>挑战开始日期 <code>challenge.startDate</code></td>
+          <td>后台挑战配置</td>
+          <td>“2026-11-18开始”</td>
+          <td>onShow 刷新</td>
+          <td>核心</td>
+        </tr>
+        <tr>
+          <td>S-15</td>
+          <td>挑战目标步数 <code>challenge.targetSteps</code></td>
+          <td>后台挑战配置</td>
+          <td>“目标步数 12000 步”</td>
+          <td>onShow 刷新</td>
+          <td>核心</td>
+        </tr>
+        <tr>
+          <td>S-16</td>
+          <td>挑战保证金 <code>challenge.depositCoupons</code></td>
+          <td>后台挑战配置</td>
+          <td>“挑战保证金0.00兑换券”</td>
+          <td>onShow 刷新</td>
+          <td>核心</td>
+        </tr>
+        <tr>
+          <td>S-17</td>
+          <td>挑战参与人数 <code>challenge.participantCount</code></td>
+          <td>后台统计</td>
+          <td>“已有309人参加”</td>
+          <td>onShow 刷新</td>
+          <td>核心</td>
+        </tr>
+        <tr>
+          <td>S-18</td>
+          <td>挑战参与状态 <code>challenge.joined</code></td>
+          <td>前端静态占位（后续后台）</td>
+          <td>按钮“已参赛，邀请好友”；未参赛状态待设计</td>
+          <td>仅展示，不实现参赛流程</td>
+          <td>占位</td>
+        </tr>
+        <tr>
+          <td>S-19</td>
+          <td>挑战详细规则 <code>challenge.rules</code></td>
+          <td>后台配置</td>
+          <td>挑战卡“更多›”进入规则详情页</td>
+          <td>点击“更多”</td>
+          <td>核心（展示）</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h4>步数同步与兑换规则</h4>
+    <ul>
+      <li>数据来源：微信运动 <code>wx.getWeRunData</code>，后台解密后按用户、日期落库。</li>
+      <li>今日可兑步数建议公式：<code>min(max(今日步数 − 今日已兑换步数, 0), 12000)</code>。</li>
+      <li>每日兑换上限：12000（用户确认；默认按步数计）。</li>
+      <li>步数 → 兑换券的兑换比例由后台配置，具体比例<strong>待确认</strong>。</li>
+      <li>未兑换步数每日 00:00（Asia/Shanghai）清零，兑换券余额不清零。</li>
+      <li>兑换接口需要幂等控制（建议使用 requestId），避免重复点击造成重复发放。</li>
+      <li>同步按钮需处理：授权拒绝、未开启微信运动、微信运动无数据、网络失败、重复同步。</li>
+      <li>进入页面时先读取后台已同步数据；用户点击“同步最新步数”再触发微信运动授权与同步。</li>
+    </ul>
+
+    <h4>挑战数据规则</h4>
+    <ul>
+      <li>挑战的开始日期、目标步数、保证金、参与人数、详细规则均由后台下发。</li>
+      <li>详细规则在“更多”页面展示，建议使用后台富文本或结构化规则列表。</li>
+      <li>本期挑战卡只展示后台配置（开始日期、目标步数、保证金、参与人数、详细规则）。</li>
+      <li>挑战参赛流程、扣/退保证金、完成/失败判定、未参赛按钮与报名入口均<strong>占位</strong>，本期不实现；按钮“已参赛，邀请好友”按静态占位展示。</li>
+    </ul>
+
+    <h3 id="section-3-3">3.3 我</h3>
+    <table class="table compact">
+      <thead>
+        <tr><th>编号</th><th>数据项（建议字段）</th><th>来源/产生方</th><th>展示位置与方式</th><th>刷新/交互</th><th>本期状态</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>U-01</td>
+          <td>头像 <code>avatarUrl</code></td>
+          <td>微信 <code>chooseAvatar</code> / 后台</td>
+          <td>圆形头像</td>
+          <td>用户选择后、onShow 刷新</td>
+          <td>核心</td>
+        </tr>
+        <tr>
+          <td>U-02</td>
+          <td>昵称 <code>nickname</code></td>
+          <td>微信 <code>nickname</code> 输入 / 后台</td>
+          <td>白色大字</td>
+          <td>用户保存后、onShow 刷新</td>
+          <td>核心</td>
+        </tr>
+        <tr>
+          <td>U-03</td>
+          <td>定位/城市 <code>location</code></td>
+          <td>微信定位 / 后台</td>
+          <td>图钉图标</td>
+          <td>点击（功能未设计）</td>
+          <td>占位</td>
+        </tr>
+        <tr>
+          <td>U-04</td>
+          <td>设置</td>
+          <td>—</td>
+          <td>齿轮图标</td>
+          <td>点击（设置页未设计）</td>
+          <td>占位</td>
+        </tr>
+        <tr>
+          <td>U-05</td>
+          <td>我的收藏 <code>favoriteCount</code></td>
+          <td>后台</td>
+          <td>数字 0 +“★我的收藏”</td>
+          <td>onShow 刷新</td>
+          <td>占位</td>
+        </tr>
+        <tr>
+          <td>U-06</td>
+          <td>我的足迹 <code>footprintCount</code></td>
+          <td>后台</td>
+          <td>数字 0 +“❥我的足迹”</td>
+          <td>onShow 刷新</td>
+          <td>占位</td>
+        </tr>
+        <tr>
+          <td>U-07</td>
+          <td>订单状态数量 <code>orderCounts</code></td>
+          <td>后台订单</td>
+          <td>5 个入口：待付款/待发货/待收货/已完成/售后</td>
+          <td>onShow 刷新</td>
+          <td>占位</td>
+        </tr>
+        <tr>
+          <td>U-08</td>
+          <td>积分 <code>points</code></td>
+          <td>后台</td>
+          <td>数字 0</td>
+          <td>onShow 刷新</td>
+          <td>占位</td>
+        </tr>
+        <tr>
+          <td>U-09</td>
+          <td>优惠券 <code>couponCount</code></td>
+          <td>后台</td>
+          <td>数字 0</td>
+          <td>onShow 刷新</td>
+          <td>占位</td>
+        </tr>
+        <tr>
+          <td>U-10</td>
+          <td>卡券 <code>cardVoucher</code></td>
+          <td>后台</td>
+          <td>黄色卡券卡 + ¥</td>
+          <td>点击（功能未设计）</td>
+          <td>占位</td>
+        </tr>
+        <tr>
+          <td>U-11</td>
+          <td>菜单配置 <code>menus[]</code></td>
+          <td>前端静态/后台配置</td>
+          <td>4 列网格 11 项</td>
+          <td>点击跳转</td>
+          <td>占位（仅数据流）</td>
+        </tr>
+        <tr>
+          <td>U-12</td>
+          <td>绑定手机号 <code>phoneBound</code></td>
+          <td>微信 <code>getPhoneNumber</code> / 后台</td>
+          <td>菜单项</td>
+          <td>点击（流程未设计）</td>
+          <td>占位</td>
+        </tr>
+        <tr>
+          <td>U-13</td>
+          <td>客服</td>
+          <td>微信客服 / 后台</td>
+          <td>菜单项</td>
+          <td>点击</td>
+          <td>占位</td>
+        </tr>
+        <tr>
+          <td>U-14</td>
+          <td>清除缓存</td>
+          <td>本地</td>
+          <td>菜单项</td>
+          <td>点击确认</td>
+          <td>占位（工具）</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 id="section-4">4. 核心数据实体与字段建议</h2>
+    <blockquote>
+      <p>以下为建议模型，用于说明数据产生、存储和展示关系；具体表结构由后台设计确定。</p>
+    </blockquote>
+
+    <h3 id="section-4-1">4.1 用户 User</h3>
+    <table class="table">
+      <thead>
+        <tr><th>字段</th><th>类型</th><th>必填</th><th>来源</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>bigint/string</td><td>是</td><td>后台</td><td>用户主键</td></tr>
+        <tr><td><code>openid</code></td><td>string</td><td>是</td><td>微信 <code>wx.login</code></td><td>小程序用户唯一标识，唯一</td></tr>
+        <tr><td><code>unionid</code></td><td>string</td><td>否</td><td>微信</td><td>绑定开放平台时使用</td></tr>
+        <tr><td><code>avatarUrl</code></td><td>string</td><td>否</td><td><code>chooseAvatar</code></td><td>用户头像地址</td></tr>
+        <tr><td><code>nickname</code></td><td>string</td><td>否</td><td><code>nickname</code> 输入</td><td>用户昵称</td></tr>
+        <tr><td><code>phone</code></td><td>string</td><td>否</td><td><code>getPhoneNumber</code></td><td>绑定手机号，本期占位</td></tr>
+        <tr><td><code>createdAt</code></td><td>datetime</td><td>是</td><td>后台</td><td>创建时间</td></tr>
+        <tr><td><code>updatedAt</code></td><td>datetime</td><td>是</td><td>后台</td><td>更新时间</td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="section-4-2">4.2 报名 Registration</h3>
+    <table class="table">
+      <thead>
+        <tr><th>字段</th><th>类型</th><th>必填</th><th>来源</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>bigint/string</td><td>是</td><td>后台</td><td>报名记录主键</td></tr>
+        <tr><td><code>activityId</code></td><td>string</td><td>是</td><td>后台</td><td>活动 ID</td></tr>
+        <tr><td><code>userId</code></td><td>string</td><td>是</td><td>后台</td><td>关联用户</td></tr>
+        <tr><td><code>realName</code></td><td>string(20)</td><td>是</td><td>用户输入</td><td>姓名</td></tr>
+        <tr><td><code>phone</code></td><td>string(11)</td><td>是</td><td>用户输入</td><td>手机号</td></tr>
+        <tr><td><code>company</code></td><td>string(50)</td><td>是</td><td>用户输入</td><td>工作单位</td></tr>
+        <tr><td><code>status</code></td><td>enum</td><td>是</td><td>后台</td><td><code>registered</code> / <code>cancelled</code></td></tr>
+        <tr><td><code>createdAt</code></td><td>datetime</td><td>是</td><td>后台</td><td>报名时间</td></tr>
+        <tr><td><code>updatedAt</code></td><td>datetime</td><td>是</td><td>后台</td><td>最后修改时间</td></tr>
+        <tr><td><code>cancelledAt</code></td><td>datetime</td><td>否</td><td>后台</td><td>取消时间</td></tr>
+      </tbody>
+    </table>
+    <p><strong>唯一约束建议：</strong></p>
+    <ul>
+      <li><code>(activityId, userId)</code> 唯一：一个用户在同一活动只能有一条报名记录。</li>
+      <li><code>(activityId, phone)</code> 唯一：一个手机号在同一活动只能报名一次。</li>
+    </ul>
+
+    <h3 id="section-4-3">4.3 活动配置 ActivityConfig</h3>
+    <table class="table">
+      <thead>
+        <tr><th>字段</th><th>类型</th><th>必填</th><th>来源</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>activityId</code></td><td>string</td><td>是</td><td>后台</td><td>活动 ID</td></tr>
+        <tr><td><code>noticeText</code></td><td>string</td><td>否</td><td>后台</td><td>首页公告文案，如“延期：10月27日-12月27日”</td></tr>
+        <tr><td><code>rules</code></td><td>json/text</td><td>是</td><td>后台</td><td>首页活动规则，建议有序数组</td></tr>
+        <tr><td><code>startDate</code></td><td>date</td><td>否</td><td>后台</td><td>活动开始日期</td></tr>
+        <tr><td><code>endDate</code></td><td>date</td><td>否</td><td>后台</td><td>活动结束日期</td></tr>
+        <tr><td><code>status</code></td><td>enum</td><td>是</td><td>后台</td><td>未开始/进行中/已结束</td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="section-4-4">4.4 每日步数 DailyStep</h3>
+    <table class="table">
+      <thead>
+        <tr><th>字段</th><th>类型</th><th>必填</th><th>来源</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>bigint/string</td><td>是</td><td>后台</td><td>主键</td></tr>
+        <tr><td><code>userId</code></td><td>string</td><td>是</td><td>后台</td><td>用户 ID</td></tr>
+        <tr><td><code>statDate</code></td><td>date</td><td>是</td><td>微信运动数据</td><td>统计日期</td></tr>
+        <tr><td><code>steps</code></td><td>int</td><td>是</td><td>微信运动</td><td>当日步数</td></tr>
+        <tr><td><code>source</code></td><td>string</td><td>是</td><td>后台</td><td>数据来源，如 <code>werun</code></td></tr>
+        <tr><td><code>syncedAt</code></td><td>datetime</td><td>是</td><td>后台</td><td>同步时间</td></tr>
+        <tr><td><code>createdAt</code></td><td>datetime</td><td>是</td><td>后台</td><td>创建时间</td></tr>
+      </tbody>
+    </table>
+    <p>唯一约束建议：<code>(userId, statDate)</code> 唯一；同步时按日期更新，不重复插入。</p>
+
+    <h3 id="section-4-5">4.5 兑换记录 ExchangeRecord</h3>
+    <table class="table">
+      <thead>
+        <tr><th>字段</th><th>类型</th><th>必填</th><th>来源</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>bigint/string</td><td>是</td><td>后台</td><td>主键</td></tr>
+        <tr><td><code>userId</code></td><td>string</td><td>是</td><td>后台</td><td>用户 ID</td></tr>
+        <tr><td><code>statDate</code></td><td>date</td><td>是</td><td>后台</td><td>兑换所属日期</td></tr>
+        <tr><td><code>steps</code></td><td>int</td><td>是</td><td>后台</td><td>本次兑换步数</td></tr>
+        <tr><td><code>couponAmount</code></td><td>decimal(10,2)</td><td>是</td><td>后台</td><td>本次获得兑换券</td></tr>
+        <tr><td><code>rate</code></td><td>decimal(10,4)</td><td>是</td><td>后台</td><td>本次使用的兑换比例</td></tr>
+        <tr><td><code>requestId</code></td><td>string</td><td>是</td><td>前端/后台</td><td>幂等键</td></tr>
+        <tr><td><code>status</code></td><td>enum</td><td>是</td><td>后台</td><td><code>success</code> / <code>failed</code></td></tr>
+        <tr><td><code>createdAt</code></td><td>datetime</td><td>是</td><td>后台</td><td>创建时间</td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="section-4-6">4.6 兑换券账户 CouponAccount / 流水 CouponLedger</h3>
+    <p><strong>CouponAccount</strong></p>
+    <table class="table">
+      <thead>
+        <tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>userId</code></td><td>string</td><td>是</td><td>用户 ID，唯一</td></tr>
+        <tr><td><code>balance</code></td><td>decimal(10,2)</td><td>是</td><td>当前余额</td></tr>
+        <tr><td><code>totalEarned</code></td><td>decimal(10,2)</td><td>是</td><td>累计获得</td></tr>
+        <tr><td><code>totalSpent</code></td><td>decimal(10,2)</td><td>是</td><td>累计消耗</td></tr>
+        <tr><td><code>updatedAt</code></td><td>datetime</td><td>是</td><td>更新时间</td></tr>
+      </tbody>
+    </table>
+
+    <p><strong>CouponLedger</strong></p>
+    <table class="table">
+      <thead>
+        <tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>bigint/string</td><td>是</td><td>流水主键</td></tr>
+        <tr><td><code>userId</code></td><td>string</td><td>是</td><td>用户 ID</td></tr>
+        <tr><td><code>type</code></td><td>enum</td><td>是</td><td><code>exchange</code> / <code>challenge_deposit</code> / <code>refund</code> / <code>adjust</code></td></tr>
+        <tr><td><code>amount</code></td><td>decimal(10,2)</td><td>是</td><td>变动金额，正负号表示增减</td></tr>
+        <tr><td><code>balanceAfter</code></td><td>decimal(10,2)</td><td>是</td><td>变动后余额</td></tr>
+        <tr><td><code>refType</code></td><td>string</td><td>否</td><td>关联业务类型</td></tr>
+        <tr><td><code>refId</code></td><td>string</td><td>否</td><td>关联业务 ID</td></tr>
+        <tr><td><code>createdAt</code></td><td>datetime</td><td>是</td><td>创建时间</td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="section-4-7">4.7 步数挑战 Challenge（配置核心）/ ChallengeParticipation（占位，预留）</h3>
+    <p><strong>Challenge</strong></p>
+    <table class="table">
+      <thead>
+        <tr><th>字段</th><th>类型</th><th>必填</th><th>来源</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>string</td><td>是</td><td>后台</td><td>挑战 ID</td></tr>
+        <tr><td><code>title</code></td><td>string</td><td>是</td><td>后台</td><td>挑战名称</td></tr>
+        <tr><td><code>startDate</code></td><td>date</td><td>是</td><td>后台</td><td>开始日期，对应“2026-11-18开始”</td></tr>
+        <tr><td><code>endDate</code></td><td>date</td><td>否</td><td>后台</td><td>结束日期</td></tr>
+        <tr><td><code>targetSteps</code></td><td>int</td><td>是</td><td>后台</td><td>目标步数，对应“12000”</td></tr>
+        <tr><td><code>depositCoupons</code></td><td>decimal(10,2)</td><td>是</td><td>后台</td><td>保证金，对应“0.00兑换券”</td></tr>
+        <tr><td><code>participantCount</code></td><td>int</td><td>是</td><td>后台统计</td><td>参与人数，对应“309人”</td></tr>
+        <tr><td><code>rules</code></td><td>json/text</td><td>是</td><td>后台</td><td>详细规则，供“更多”页展示</td></tr>
+        <tr><td><code>status</code></td><td>enum</td><td>是</td><td>后台</td><td>未开始/进行中/已结束</td></tr>
+      </tbody>
+    </table>
+
+    <p><strong>ChallengeParticipation（占位，预留）</strong></p>
+    <table class="table">
+      <thead>
+        <tr><th>字段</th><th>类型</th><th>必填</th><th>来源</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>bigint/string</td><td>是</td><td>后台</td><td>参与记录主键</td></tr>
+        <tr><td><code>challengeId</code></td><td>string</td><td>是</td><td>后台</td><td>挑战 ID</td></tr>
+        <tr><td><code>userId</code></td><td>string</td><td>是</td><td>后台</td><td>用户 ID</td></tr>
+        <tr><td><code>status</code></td><td>enum</td><td>是</td><td>后台</td><td><code>joined</code> / <code>completed</code> / <code>failed</code> / <code>cancelled</code></td></tr>
+        <tr><td><code>depositCoupons</code></td><td>decimal(10,2)</td><td>是</td><td>后台</td><td>实际扣除保证金</td></tr>
+        <tr><td><code>joinedAt</code></td><td>datetime</td><td>是</td><td>后台</td><td>参赛时间</td></tr>
+        <tr><td><code>completedAt</code></td><td>datetime</td><td>否</td><td>后台</td><td>完成时间</td></tr>
+      </tbody>
+    </table>
+    <p>说明：本期只使用 Challenge 配置表展示卡片数据；ChallengeParticipation 及其参赛、保证金、完成/失败判定流程全部占位，暂不建表、不实现。</p>
+
+    <h3 id="section-4-8">4.8 每日提醒 Reminder（占位）</h3>
+    <p>本期不建业务表，也不实现后台推送。UI 开关为纯占位状态；推送通道、模板、推送时间仅作为后续设计预留，待确认。</p>
+
+    <h2 id="section-5">5. 数据流与责任矩阵</h2>
+
+    <h3 id="section-5-1">5.1 核心/占位数据责任</h3>
+    <table class="table">
+      <thead>
+        <tr><th>数据域</th><th>产生方</th><th>存储/处理方</th><th>展示方</th><th>本期状态</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>用户身份</td><td>微信 <code>wx.login</code></td><td>后台</td><td>全局</td><td>核心</td></tr>
+        <tr><td>报名</td><td>用户输入</td><td>后台</td><td>首页报名表单/状态</td><td>核心</td></tr>
+        <tr><td>头像、昵称</td><td>用户/微信</td><td>后台</td><td>我页</td><td>核心</td></tr>
+        <tr><td>微信步数</td><td>微信运动</td><td>后台解密、存储、计算</td><td>步数宝表盘</td><td>核心</td></tr>
+        <tr><td>兑换券余额</td><td>后台（兑换产生）</td><td>后台账户/流水</td><td>步数宝顶部条</td><td>核心</td></tr>
+        <tr><td>步数挑战配置</td><td>后台</td><td>后台</td><td>步数宝挑战卡、更多页</td><td>核心（仅展示配置）</td></tr>
+        <tr><td>挑战参与状态</td><td>前端静态（后续后台）</td><td>—</td><td>挑战卡按钮</td><td>占位（参赛流程不实现）</td></tr>
+        <tr><td>排行榜</td><td>后台</td><td>后台</td><td>排行榜页</td><td>占位</td></tr>
+        <tr><td>邀请/助力</td><td>后台</td><td>后台</td><td>步数宝好友助力卡</td><td>占位</td></tr>
+        <tr><td>每日提醒</td><td>后台（预留）</td><td>后台、微信服务通知（预留）</td><td>微信服务通知（预留）</td><td>占位（不实现推送）</td></tr>
+        <tr><td>我的订单</td><td>后台</td><td>后台</td><td>我页、订单页</td><td>占位</td></tr>
+        <tr><td>积分、优惠券、卡券</td><td>后台</td><td>后台</td><td>我页、资产页</td><td>占位</td></tr>
+        <tr><td>我的收藏、我的足迹</td><td>后台</td><td>后台</td><td>我页、列表页</td><td>占位</td></tr>
+        <tr><td>收货地址、分销中心、分类、领券中心</td><td>后台/用户</td><td>后台</td><td>对应目标页</td><td>占位</td></tr>
+        <tr><td>绑定手机号</td><td>微信/后台</td><td>后台</td><td>我页、账号页</td><td>占位</td></tr>
+        <tr><td>客服</td><td>微信客服/后台</td><td>微信</td><td>客服会话</td><td>占位</td></tr>
+        <tr><td>清除缓存</td><td>本地</td><td>本地</td><td>本地</td><td>占位</td></tr>
+        <tr><td>定位</td><td>微信/后台</td><td>后台</td><td>我页图钉</td><td>占位</td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="section-5-2">5.2 “我”页 11 个菜单项数据流向</h3>
+    <blockquote>
+      <p>按要求只梳理“由谁产生、由谁显示”，不展开功能实现。</p>
+    </blockquote>
+    <table class="table">
+      <thead>
+        <tr><th>菜单项</th><th>数据产生方</th><th>数据展示方</th><th>数据内容</th><th>本期状态</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>我的收藏</td><td>用户收藏行为 / 后台</td><td>我页数字、收藏列表页</td><td>收藏对象、收藏数量</td><td>占位</td></tr>
+        <tr><td>我的优惠券</td><td>后台发放</td><td>我页数字、优惠券列表页</td><td>券模板、状态、数量</td><td>占位</td></tr>
+        <tr><td>我的卡券</td><td>后台发放</td><td>我页卡券卡、卡券列表页</td><td>卡券信息、余额/数量</td><td>占位</td></tr>
+        <tr><td>领券中心</td><td>后台配置</td><td>领券中心页</td><td>可领取券列表</td><td>占位</td></tr>
+        <tr><td>收货地址</td><td>用户输入 / 微信地址</td><td>地址页、订单页</td><td>收货人、电话、地址</td><td>占位</td></tr>
+        <tr><td>绑定手机号</td><td>微信 <code>getPhoneNumber</code> → 后台</td><td>我页、账号页</td><td>手机号、绑定状态</td><td>占位</td></tr>
+        <tr><td>分销中心</td><td>后台</td><td>分销中心页</td><td>邀请关系、佣金/分销数据</td><td>占位</td></tr>
+        <tr><td>分类</td><td>后台配置</td><td>分类页</td><td>商品分类</td><td>占位</td></tr>
+        <tr><td>个人资料</td><td>用户 / 微信</td><td>个人资料页、我页</td><td>头像、昵称、手机号</td><td>个人资料页占位；头像昵称核心</td></tr>
+        <tr><td>清除缓存</td><td>本地</td><td>本地</td><td>缓存键、缓存大小</td><td>占位（工具）</td></tr>
+        <tr><td>客服</td><td>微信客服 / 后台</td><td>客服会话</td><td>会话消息</td><td>占位</td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="section-5-3">5.3 其他占位资产入口</h3>
+    <table class="table">
+      <thead>
+        <tr><th>入口</th><th>数据产生方</th><th>数据展示方</th><th>本期状态</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>我的订单（待付款/待发货/待收货/已完成/售后）</td><td>后台订单系统</td><td>我页订单卡、订单列表页</td><td>占位</td></tr>
+        <tr><td>积分</td><td>后台</td><td>我页积分卡</td><td>占位</td></tr>
+        <tr><td>优惠券</td><td>后台</td><td>我页优惠券卡</td><td>占位</td></tr>
+        <tr><td>卡券</td><td>后台</td><td>我页卡券卡</td><td>占位</td></tr>
+        <tr><td>我的收藏</td><td>后台/用户行为</td><td>我页统计、收藏列表</td><td>占位</td></tr>
+        <tr><td>我的足迹</td><td>后台</td><td>我页统计、足迹列表</td><td>占位</td></tr>
+        <tr><td>排行榜</td><td>后台</td><td>步数宝入口、排行榜页</td><td>占位</td></tr>
+        <tr><td>邀请/助力</td><td>后台</td><td>步数宝好友助力卡</td><td>占位</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="section-6">6. 呈现与格式约定</h2>
+
+    <h3 id="section-6-1">6.1 数值与文本格式</h3>
+    <table class="table">
+      <thead>
+        <tr><th>数据类型</th><th>格式</th><th>示例</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>兑换券余额</td><td>保留 2 位小数</td><td><code>19.00</code></td><td>顶部使用金币/¥ 图标；是否等价人民币待确认</td></tr>
+        <tr><td>步数</td><td>整数</td><td><code>6638</code></td><td>当前 UI 未使用千分位</td></tr>
+        <tr><td>百分比</td><td>整数 + <code>%</code></td><td><code>0%</code></td><td>占位状态显示 0%</td></tr>
+        <tr><td>人数/数量</td><td>整数 + 单位</td><td><code>309人</code>、<code>0张</code></td><td>占位状态显示 0</td></tr>
+        <tr><td>挑战日期</td><td><code>YYYY-MM-DD开始</code></td><td><code>2026-11-18开始</code></td><td>由后台下发</td></tr>
+        <tr><td>公告日期</td><td>后台文案原样展示</td><td><code>延期：10月27日-12月27日</code></td><td>前端不解析年份</td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="section-6-2">6.2 表单与按钮状态</h3>
+    <ul>
+      <li>报名表单字段均必填，label 后保留红色 <code>*</code>。</li>
+      <li>电话输入框右侧保留“11位”提示；不使用短信验证码。</li>
+      <li>底部固定主按钮：
+        <ul>
+          <li>未报名：<code>提交报名</code></li>
+          <li>已报名：<code>保存修改</code></li>
+          <li>取消报名：独立文字按钮或次级按钮，需二次确认。</li>
+        </ul>
+      </li>
+      <li>已报名状态：表单回填，展示“已报名”标识。</li>
+      <li>已取消状态：展示“已取消”，并允许再次报名；再次报名复用原记录并恢复为“已报名”。</li>
+      <li>提交成功/失败使用 Toast 或页面内提示；具体样式待设计。</li>
+    </ul>
+
+    <h3 id="section-6-3">6.3 空状态与异常状态</h3>
+    <ul>
+      <li>数字类占位统一显示 <code>0</code>；兑换券显示 <code>0.00</code>。</li>
+      <li>好友助力“+”位保留 4 个空位。</li>
+      <li>微信运动未授权/无数据：步数显示 <code>0</code>，同步时提示用户开启微信运动或前往设置授权。</li>
+      <li>网络异常：保留上次数据，提示“加载失败，请重试”。</li>
+      <li>兑换失败：提示失败原因，不扣减步数、不增加兑换券。</li>
+    </ul>
+
+    <h3 id="section-6-4">6.4 刷新时机</h3>
+    <ul>
+      <li>首页：进入页面时刷新公告、规则、报名状态。</li>
+      <li>步数宝：进入页面时刷新兑换券余额、可兑步数、挑战数据；点击“同步最新步数”时同步微信运动；兑换成功后刷新余额和可兑步数。</li>
+      <li>我：进入页面时刷新头像、昵称、占位统计数字。</li>
+      <li>当前未配置下拉刷新；是否需要待确认。</li>
+    </ul>
+
+    <h2 id="section-7">7. 校验、异常与隐私</h2>
+
+    <h3 id="section-7-1">7.1 报名校验</h3>
+    <table class="table">
+      <thead>
+        <tr><th>字段</th><th>规则</th><th>提示</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>姓名</td><td>必填；去除首尾空格；建议 2–20 个字符</td><td>请输入姓名</td></tr>
+        <tr><td>电话</td><td>必填；中国大陆手机号 11 位，建议正则 <code>^1[3-9]\d{9}$</code></td><td>请输入正确的手机号</td></tr>
+        <tr><td>工作单位</td><td>必填；去除首尾空格；建议 2–50 个字符</td><td>请输入工作单位</td></tr>
+      </tbody>
+    </table>
+    <ul>
+      <li>同一用户、同一手机号重复报名：拦截并提示“您已报名”。</li>
+      <li>修改报名信息时，手机号若与其他报名记录冲突：拦截并提示。</li>
+      <li>取消报名：二次确认，确认后状态置为“已取消”。</li>
+    </ul>
+
+    <h3 id="section-7-2">7.2 步数与兑换异常</h3>
+    <ul>
+      <li>未授权微信运动：提示授权；用户拒绝后保留 0 步。</li>
+      <li>未开启微信运动：提示“请先开启微信运动”。</li>
+      <li>微信运动无当日数据：提示“暂无步数数据”。</li>
+      <li>同步失败：保留上次数据，提示重试。</li>
+      <li>可兑步数为 0：兑换按钮不可用或提示“暂无可兑换步数”。</li>
+      <li>超过每日上限 12000：按上限计算，提示当日上限。</li>
+      <li>兑换请求重复：后台按 <code>requestId</code> 幂等处理。</li>
+    </ul>
+
+    <h3 id="section-7-3">7.3 隐私与合规建议</h3>
+    <ul>
+      <li>收集姓名、电话、工作单位、微信运动步数前，应提供隐私政策并获得用户同意。</li>
+      <li>手机号属于个人信息，后台应加密存储、限制访问权限。</li>
+      <li>微信运动步数仅用于本次活动，不向无关第三方提供。</li>
+      <li>头像、昵称通过微信授权获取，用户可拒绝；拒绝时展示默认头像/昵称。</li>
+      <li>报名页面建议增加隐私协议勾选；具体交互待确认。</li>
+      <li>数据保留期限、注销/删除机制待运营确认。</li>
+    </ul>
+
+    <h2 id="section-8">8. 后台推送（本期仅占位）</h2>
+
+    <h3 id="section-8-1">8.1 每日兑换提醒</h3>
+    <table class="table">
+      <thead>
+        <tr><th>项目</th><th>内容</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>推送方</td><td>后台定时任务（预留，不实现）</td></tr>
+        <tr><td>接收方</td><td>已报名/参与活动的用户（预留）</td></tr>
+        <tr><td>通道</td><td>微信订阅消息（预留，模板与订阅类型待确认）</td></tr>
+        <tr><td>内容</td><td>提醒用户进入步数宝查看可兑步数并兑换</td></tr>
+        <tr><td>触发时间</td><td>待确认（建议每日固定时间，如 20:00）</td></tr>
+        <tr><td>点击去向</td><td>步数宝页面</td></tr>
+        <tr><td>当前 UI</td><td>“每日兑换提醒”开关为纯占位，不请求订阅、不保存状态</td></tr>
+      </tbody>
+    </table>
+    <p>说明：</p>
+    <ul>
+      <li>本期不实现后台推送，也不调用 <code>wx.requestSubscribeMessage</code>；本节仅保留后续设计。</li>
+      <li>后续启用时，微信订阅消息必须由用户点击授权；一次性订阅与长期订阅取决于小程序类目和模板能力。</li>
+      <li>是否还有其他后台推送场景，本期不做。</li>
+    </ul>
+
+    <h3 id="section-8-2">8.2 推送数据建议字段（仅预留，不建表）</h3>
+    <table class="table">
+      <thead>
+        <tr><th>字段</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>userId</code></td><td>接收用户</td></tr>
+        <tr><td><code>templateId</code></td><td>订阅消息模板 ID</td></tr>
+        <tr><td><code>scheduledAt</code></td><td>计划推送时间</td></tr>
+        <tr><td><code>sentAt</code></td><td>实际推送时间</td></tr>
+        <tr><td><code>status</code></td><td>待推送/成功/失败</td></tr>
+        <tr><td><code>result</code></td><td>微信返回结果或失败原因</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="section-9">9. 已确认事项与待确认项</h2>
+
+    <h3 id="section-9-1">9.1 已确认</h3>
+    <ol>
+      <li><strong>报名取消后可再次报名</strong>：取消后复用原报名记录并恢复为“已报名”；同一时间同一用户/手机号只能有一条有效报名记录。</li>
+      <li><strong>每日兑换提醒</strong>：开关与后台推送均仅占位；本期不请求订阅、不保存订阅状态、不发送推送。</li>
+      <li><strong>步数挑战</strong>：本期只展示后台配置（开始日期、目标步数、保证金、参与人数、详细规则）；参赛流程、保证金扣退、完成/失败判定、未参赛按钮均为占位，不实现。</li>
+      <li><strong>“我”页 11 个菜单项</strong>：只梳理数据产生方和展示方，不实现目标页功能。</li>
+    </ol>
+
+    <h3 id="section-9-2">9.2 仍待确认</h3>
+    <ol>
+      <li><strong>每日兑换上限 12000 的单位</strong>：当前按“12000 步/日”理解；若指兑换券数量或其他口径，需要调整。</li>
+      <li><strong>步数 → 兑换券的兑换比例</strong>：建议由后台配置，具体值待定。</li>
+      <li><strong>活动时间</strong>：公告“10月27日-12月27日”和挑战“2026-11-18开始”均由后台配置，前端不解析年份；具体活动起止时间待运营确认。</li>
+      <li><strong>报名状态页面呈现</strong>：已报名、已取消、再次报名的视觉与交互细节待确认。</li>
+      <li><strong>刷新、异常与隐私交互</strong>：是否需要下拉刷新、统一错误页、隐私协议勾选，待确认。</li>
+      <li><strong>“我的足迹”定义</strong>：当前按占位处理，具体指浏览足迹还是运动足迹待确认。</li>
+      <li><strong>“个人资料”页与头像昵称的关系</strong>：头像昵称在本期为核心数据；“个人资料”菜单目标页仍为占位，是否本期实现待确认。</li>
+    </ol>
+
+    <h2 id="section-10">10. 变更记录</h2>
+    <table class="table">
+      <thead>
+        <tr><th>版本</th><th>日期</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>v1.0</td><td>2026-11-17</td><td>根据 <code>LabourRunfront</code> 界面和用户确认结果整理初版</td></tr>
+        <tr><td>v1.1</td><td>2026-11-17</td><td>每日提醒仅占位；挑战参赛流程占位；报名取消后可再次报名</td></tr>
+      </tbody>
+    </table>
+
+  </div>
+</main>
+</body>
+</html>

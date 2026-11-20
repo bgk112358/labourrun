@@ -1,0 +1,64 @@
+from __future__ import annotations
+
+from typing import Any
+
+
+class ErrorCode:
+    OK = 0
+
+    UNAUTHORIZED = 1001
+    TOKEN_EXPIRED = 1002
+    WX_SESSION_EXPIRED = 1003
+    WX_LOGIN_FAILED = 1004
+    WX_CONFIG_ERROR = 1005
+
+    REGISTRATION_DUPLICATE = 2001
+    REGISTRATION_NOT_FOUND = 2002
+    REGISTRATION_CANCELLED = 2003
+
+    WERUN_AUTH_FAILED = 3001
+    NO_STEP_DATA = 3002
+    NO_CONVERTIBLE_STEPS = 3003
+    DAILY_CAP_REACHED = 3004
+    EXCHANGE_AMOUNT_TOO_SMALL = 3006
+
+    VALIDATION_ERROR = 4000
+    CHALLENGE_NOT_FOUND = 4001
+    NOT_FOUND = 4040
+    METHOD_NOT_ALLOWED = 4050
+
+    ACTIVITY_NOT_FOUND = 5001
+
+    ADMIN_UNAUTHORIZED = 1101
+    ADMIN_TOKEN_EXPIRED = 1102
+    ADMIN_FORBIDDEN = 1103
+    ADMIN_LOGIN_FAILED = 1104
+    ADMIN_DISABLED = 1105
+    ADMIN_NOT_FOUND = 1106
+    ADMIN_USERNAME_EXISTS = 1107
+    ADMIN_LAST_SUPER = 1108
+    ADMIN_PASSWORD_POLICY = 1109
+    ADMIN_RATE_LIMITED = 1110
+    ADMIN_ACTIVITY_NOT_FOUND = 1201
+    ADMIN_CHALLENGE_NOT_FOUND = 1202
+    ADMIN_CONFIG_INVALID = 1203
+    ADMIN_REGISTRATION_NOT_FOUND = 1204
+
+    INTERNAL_ERROR = 9001
+    MOCK_DISABLED = 9002
+    CONFIG_ERROR = 9003
+
+
+class AppError(Exception):
+    def __init__(
+        self,
+        code: int,
+        http_status: int,
+        message: str,
+        data: Any = None,
+    ) -> None:
+        super().__init__(message)
+        self.code = code
+        self.http_status = http_status
+        self.message = message
+        self.data = data

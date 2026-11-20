@@ -1,0 +1,9 @@
+<view class="nav-bar" style="background: {{background}}; color: {{color}};">
+  <view class="nav-status" style="height: {{statusBarHeight}}px;"></view>
+  <view class="nav-content" style="height: {{navContentHeight}}px;">
+    <view class="nav-back" wx:if="{{showBack}}" bindtap="onBack" hover-class="nav-back-hover">
+      <view class="chevron"></view>
+    </view>
+    <view class="nav-title">{{title}}</view>
+  </view>
+</view>

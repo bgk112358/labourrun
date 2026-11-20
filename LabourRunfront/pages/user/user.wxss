@@ -1,0 +1,474 @@
+.page-user {
+  min-height: 100vh;
+  padding-bottom: 130rpx;
+  padding-bottom: calc(110rpx + env(safe-area-inset-bottom));
+  background: #F7F7F7;
+}
+
+/* 红色渐变头部 */
+.user-header {
+  position: relative;
+  height: 720rpx;
+  overflow: hidden;
+  background: linear-gradient(135deg, #F4533F 0%, #F86A52 55%, #F98C76 100%);
+}
+.header-main {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  padding: 24rpx 40rpx 0;
+}
+
+/* 头像：墨镜小人 + 白兔 */
+.avatar {
+  position: relative;
+  flex: none;
+  width: 130rpx;
+  height: 130rpx;
+  margin-right: 24rpx;
+  border: 4rpx solid rgba(255, 255, 255, .85);
+  border-radius: 50%;
+  background: #FFE0C4;
+  overflow: hidden;
+}
+.face {
+  position: absolute;
+  left: 26rpx;
+  top: 42rpx;
+  width: 70rpx;
+  height: 70rpx;
+  border-radius: 50%;
+  background: #F5C9A4;
+}
+.hair {
+  position: absolute;
+  top: -6rpx;
+  left: -4rpx;
+  width: 78rpx;
+  height: 34rpx;
+  border-radius: 40rpx 40rpx 12rpx 12rpx;
+  background: #3A2D2A;
+}
+.glass {
+  position: absolute;
+  top: 24rpx;
+  width: 22rpx;
+  height: 16rpx;
+  border-radius: 6rpx;
+  background: #1A1A1A;
+}
+.glass-l { left: 8rpx; }
+.glass-r { right: 8rpx; }
+.glass-bridge {
+  position: absolute;
+  top: 30rpx;
+  left: 29rpx;
+  width: 12rpx;
+  height: 4rpx;
+  background: #1A1A1A;
+}
+.mouth {
+  position: absolute;
+  bottom: 12rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 18rpx;
+  height: 8rpx;
+  border-radius: 0 0 12rpx 12rpx;
+  background: #C96B5B;
+}
+.rabbit {
+  position: absolute;
+  right: 6rpx;
+  bottom: 6rpx;
+  width: 46rpx;
+  height: 52rpx;
+}
+.rabbit-ear {
+  position: absolute;
+  top: 0;
+  width: 12rpx;
+  height: 26rpx;
+  border-radius: 50%;
+  background: #FFFFFF;
+  box-shadow: inset 0 0 0 2rpx #E8E8E8;
+}
+.ear-l { left: 8rpx; transform: rotate(-12deg); }
+.ear-r { right: 8rpx; transform: rotate(12deg); }
+.rabbit-head {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 42rpx;
+  height: 34rpx;
+  border-radius: 50%;
+  background: #FFFFFF;
+}
+.nickname {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+.header-icons {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+.location-icon {
+  position: relative;
+  width: 44rpx;
+  height: 44rpx;
+  margin-right: 24rpx;
+}
+.pin {
+  position: absolute;
+  top: 4rpx;
+  left: 11rpx;
+  width: 22rpx;
+  height: 22rpx;
+  border: 4rpx solid #FFFFFF;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+}
+.pin-dot {
+  position: absolute;
+  top: 13rpx;
+  left: 20rpx;
+  width: 6rpx;
+  height: 6rpx;
+  border-radius: 50%;
+  background: #FFFFFF;
+}
+.setting-icon {
+  position: relative;
+  width: 44rpx;
+  height: 44rpx;
+}
+.gear-center {
+  position: absolute;
+  top: 11rpx;
+  left: 11rpx;
+  width: 22rpx;
+  height: 22rpx;
+  border: 4rpx solid #FFFFFF;
+  border-radius: 50%;
+}
+.gear-tooth {
+  position: absolute;
+  background: #FFFFFF;
+  border-radius: 2rpx;
+}
+.t1 { top: 2rpx; left: 19rpx; width: 6rpx; height: 10rpx; }
+.t2 { bottom: 2rpx; left: 19rpx; width: 6rpx; height: 10rpx; }
+.t3 { left: 2rpx; top: 19rpx; width: 10rpx; height: 6rpx; }
+.t4 { right: 2rpx; top: 19rpx; width: 10rpx; height: 6rpx; }
+
+/* 统计 */
+.stats {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 110rpx;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+}
+.stat-item {
+  width: 260rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.stat-num {
+  font-size: 64rpx;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #FFFFFF;
+}
+.stat-label {
+  margin-top: 6rpx;
+  display: flex;
+  align-items: center;
+  font-size: 26rpx;
+  color: #FFFFFF;
+}
+.stat-glyph {
+  margin-right: 10rpx;
+  font-size: 26rpx;
+}
+.stat-divider {
+  width: 2rpx;
+  height: 70rpx;
+  margin-top: 8rpx;
+  background: rgba(255, 255, 255, .5);
+}
+.white-arc {
+  position: absolute;
+  left: -10%;
+  bottom: -70rpx;
+  width: 120%;
+  height: 160rpx;
+  border-radius: 50% 50% 0 0;
+  background: #F7F7F7;
+  z-index: 1;
+}
+
+/* 我的订单 */
+.order-card {
+  position: relative;
+  z-index: 3;
+  margin: -30rpx 30rpx 0;
+  padding: 30rpx 20rpx 24rpx;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, .05);
+}
+.order-head {
+  display: flex;
+  align-items: center;
+  padding: 0 10rpx;
+}
+.order-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+}
+.order-more {
+  margin-left: auto;
+  font-size: 24rpx;
+  color: #999999;
+}
+.order-grid {
+  display: flex;
+  margin-top: 28rpx;
+}
+.order-entry {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 24rpx;
+  color: #333333;
+}
+.order-icon {
+  position: relative;
+  width: 52rpx;
+  height: 48rpx;
+  margin-bottom: 14rpx;
+  border: 3rpx solid #E93B33;
+  border-radius: 8rpx;
+}
+.w-slot {
+  position: absolute;
+  right: -3rpx;
+  top: 14rpx;
+  width: 10rpx;
+  height: 16rpx;
+  border-radius: 6rpx;
+  background: #E93B33;
+}
+.box .b-line {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 3rpx;
+  background: #E93B33;
+}
+.truck {
+  width: 56rpx;
+  height: 30rpx;
+  border-radius: 4rpx;
+}
+.t-head {
+  position: absolute;
+  left: 4rpx;
+  top: 4rpx;
+  width: 24rpx;
+  height: 16rpx;
+  border: 3rpx solid #E93B33;
+  border-radius: 3rpx;
+}
+.t-wheel {
+  position: absolute;
+  bottom: -12rpx;
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  background: #E93B33;
+}
+.t-wheel.w1 { left: 6rpx; }
+.t-wheel.w2 { right: 6rpx; }
+.doc .d-line {
+  position: absolute;
+  left: 8rpx;
+  right: 8rpx;
+  height: 3rpx;
+  background: #E93B33;
+}
+.doc .l1 { top: 14rpx; }
+.doc .l2 { top: 26rpx; }
+.back {
+  border: none;
+}
+.a-shaft {
+  position: absolute;
+  left: 6rpx;
+  top: 50%;
+  width: 34rpx;
+  height: 4rpx;
+  background: #E93B33;
+}
+.a-head {
+  position: absolute;
+  right: 4rpx;
+  top: 50%;
+  width: 14rpx;
+  height: 14rpx;
+  border-top: 4rpx solid #E93B33;
+  border-right: 4rpx solid #E93B33;
+  transform: translateY(-50%) rotate(-45deg);
+}
+
+/* 积分 / 优惠券 */
+.mini-cards {
+  display: flex;
+  margin: 24rpx 30rpx 0;
+}
+.mini-card {
+  position: relative;
+  flex: 1;
+  height: 180rpx;
+  padding: 24rpx;
+  overflow: hidden;
+  background: #F7F7F7;
+  border-radius: 24rpx;
+}
+.mini-card:first-child { margin-right: 20rpx; }
+.mini-tag {
+  position: relative;
+  z-index: 2;
+  display: inline-block;
+  padding: 4rpx 16rpx;
+  border-radius: 16rpx;
+  font-size: 24rpx;
+  color: #FFFFFF;
+}
+.tag-red { background: #E93B33; }
+.tag-blue { background: #4C8FD6; }
+.mini-badge {
+  position: absolute;
+  right: 20rpx;
+  top: 22rpx;
+  z-index: 2;
+  color: #FFFFFF;
+  font-size: 44rpx;
+}
+.badge-star {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  background: #F5A623;
+  line-height: 60rpx;
+  text-align: center;
+}
+.gift-box {
+  position: absolute;
+  left: 6rpx;
+  top: 24rpx;
+  width: 44rpx;
+  height: 34rpx;
+  border-radius: 6rpx;
+  background: #FFFFFF;
+}
+.gift-ribbon {
+  position: absolute;
+  left: 24rpx;
+  top: 18rpx;
+  width: 8rpx;
+  height: 42rpx;
+  background: #4C8FD6;
+}
+.mini-num {
+  position: absolute;
+  left: 24rpx;
+  bottom: 18rpx;
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+}
+
+/* 卡券 */
+.coupon-card {
+  position: relative;
+  height: 150rpx;
+  margin: 24rpx 30rpx 0;
+  padding: 30rpx;
+  overflow: hidden;
+  border-radius: 24rpx;
+  background: linear-gradient(90deg, #FFF6DE, #FFEAB8);
+}
+.coupon-tag {
+  display: inline-block;
+  padding: 6rpx 20rpx;
+  border-radius: 18rpx;
+  background: #F5A623;
+  color: #FFFFFF;
+  font-size: 24rpx;
+}
+.coupon-yen {
+  position: absolute;
+  right: 60rpx;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 16rpx;
+  background: #FFFFFF;
+  box-shadow: 0 6rpx 14rpx rgba(245, 166, 35, .25);
+  color: #F5A623;
+  font-size: 52rpx;
+  font-weight: 700;
+  line-height: 80rpx;
+  text-align: center;
+}
+
+/* 菜单栏 */
+.menu-section {
+  margin-top: 28rpx;
+  padding: 30rpx 0 20rpx;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+}
+.menu-title {
+  padding: 0 30rpx;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+}
+.menu-grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 16rpx;
+}
+.menu-item {
+  width: 187.5rpx;
+  height: 170rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.menu-glyph {
+  font-size: 56rpx;
+  line-height: 1.2;
+  color: #E93B33;
+}
+.menu-label {
+  margin-top: 14rpx;
+  font-size: 26rpx;
+  color: #333333;
+}
+.menu-empty { visibility: hidden; }

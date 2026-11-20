@@ -1,0 +1,103 @@
+<view class="page-user">
+  <!-- 红渐变头部 -->
+  <view class="user-header">
+    <nav-bar background="transparent" color="#FFFFFF" />
+    <view class="header-main">
+      <view class="avatar">
+        <view class="face">
+          <view class="hair"></view>
+          <view class="glass glass-l"></view>
+          <view class="glass glass-r"></view>
+          <view class="glass-bridge"></view>
+          <view class="mouth"></view>
+        </view>
+        <view class="rabbit">
+          <view class="rabbit-ear ear-l"></view>
+          <view class="rabbit-ear ear-r"></view>
+          <view class="rabbit-head"></view>
+        </view>
+      </view>
+      <text class="nickname">沃德天</text>
+      <view class="header-icons">
+        <view class="location-icon">
+          <view class="pin"></view>
+          <view class="pin-dot"></view>
+        </view>
+        <view class="setting-icon">
+          <view class="gear-center"></view>
+          <view class="gear-tooth t1"></view>
+          <view class="gear-tooth t2"></view>
+          <view class="gear-tooth t3"></view>
+          <view class="gear-tooth t4"></view>
+        </view>
+      </view>
+    </view>
+    <view class="stats">
+      <view class="stat-item">
+        <text class="stat-num">0</text>
+        <view class="stat-label"><text class="stat-glyph">★</text><text>我的收藏</text></view>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-num">0</text>
+        <view class="stat-label"><text class="stat-glyph">❥</text><text>我的足迹</text></view>
+      </view>
+    </view>
+    <view class="white-arc"></view>
+  </view>
+
+  <!-- 我的订单 -->
+  <view class="order-card">
+    <view class="order-head">
+      <text class="order-title">我的订单</text>
+      <text class="order-more">查看更多›</text>
+    </view>
+    <view class="order-grid">
+      <view class="order-entry" wx:for="{{orders}}" wx:key="label">
+        <view class="order-icon {{item.icon}}">
+          <block wx:if="{{item.icon === 'wallet'}}"><view class="w-slot"></view></block>
+          <block wx:elif="{{item.icon === 'box'}}"><view class="b-line"></view></block>
+          <block wx:elif="{{item.icon === 'truck'}}"><view class="t-head"></view><view class="t-wheel w1"></view><view class="t-wheel w2"></view></block>
+          <block wx:elif="{{item.icon === 'doc'}}"><view class="d-line l1"></view><view class="d-line l2"></view></block>
+          <block wx:else><view class="a-shaft"></view><view class="a-head"></view></block>
+        </view>
+        <text>{{item.label}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 积分 / 优惠券 -->
+  <view class="mini-cards">
+    <view class="mini-card">
+      <view class="mini-tag tag-red">积分</view>
+      <view class="mini-badge badge-star">★</view>
+      <view class="mini-num">0</view>
+    </view>
+    <view class="mini-card">
+      <view class="mini-tag tag-blue">优惠券</view>
+      <view class="mini-badge badge-gift">
+        <view class="gift-box"></view>
+        <view class="gift-ribbon"></view>
+      </view>
+      <view class="mini-num">0</view>
+    </view>
+  </view>
+
+  <!-- 卡券 -->
+  <view class="coupon-card">
+    <view class="coupon-tag">卡券</view>
+    <view class="coupon-yen">¥</view>
+  </view>
+
+  <!-- 菜单栏 -->
+  <view class="menu-section">
+    <view class="menu-title">菜单栏</view>
+    <view class="menu-grid">
+      <view class="menu-item" wx:for="{{menus}}" wx:key="label">
+        <text class="menu-glyph">{{item.icon}}</text>
+        <text class="menu-label">{{item.label}}</text>
+      </view>
+      <view class="menu-item menu-empty"></view>
+    </view>
+  </view>
+</view>

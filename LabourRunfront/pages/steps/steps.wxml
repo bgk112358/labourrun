@@ -1,0 +1,122 @@
+<nav-bar title="步数宝" />
+<view class="page-steps">
+  <!-- 兑换券条 -->
+  <view class="coupon-bar">
+    <view class="coin"><text>¥</text></view>
+    <text class="coupon-label">我的兑换券</text>
+    <text class="coupon-value">19.00</text>
+    <view class="coupon-arrow"></view>
+  </view>
+
+  <!-- 天空区 -->
+  <view class="sky">
+    <view class="sky-left">
+      <view class="sky-entry">
+        <view class="trophy">
+          <view class="trophy-cup"></view>
+          <view class="trophy-stem"></view>
+          <view class="trophy-base"></view>
+        </view>
+        <text>排行榜</text>
+      </view>
+      <view class="sky-entry">
+        <view class="mini-house">
+          <view class="mini-roof"></view>
+          <view class="mini-body"></view>
+        </view>
+        <text>回首页</text>
+      </view>
+    </view>
+    <view class="rule-capsule">规则</view>
+    <view class="hill hill-back"></view>
+    <view class="hill hill-front"></view>
+    <view class="tree tree-a"><view class="trunk"></view><view class="leaf leaf-1"></view><view class="leaf leaf-2"></view></view>
+    <view class="tree tree-b"><view class="trunk"></view><view class="leaf leaf-1"></view><view class="leaf leaf-2"></view></view>
+
+    <!-- 表盘 -->
+    <view class="dial">
+      <view class="dial-ticks">
+        <view class="tick" wx:for="{{ticks}}" wx:key="*this" style="transform: rotate({{item}}deg);"></view>
+      </view>
+      <view class="dial-inner">
+        <text class="dial-label">今日可兑步数</text>
+        <text class="dial-number">6638</text>
+        <view class="dial-action">点击兑换</view>
+        <text class="dial-tip">每日零点清零</text>
+      </view>
+    </view>
+    <view class="sync">
+      <view class="refresh">↻</view>
+      <text>同步最新步数</text>
+    </view>
+  </view>
+
+  <!-- 邀请胶囊 -->
+  <view class="invite-btn">邀请好友获得永久步数加成</view>
+
+  <!-- 好友助力卡 -->
+  <view class="friend-card">
+    <view class="friend-left">
+      <view class="friend-top">
+        <view class="friend-titles">
+          <text>好友</text>
+          <text>助力</text>
+        </view>
+        <view class="friend-adds">
+          <view class="add-plus" wx:for="{{adds}}" wx:key="*this">+</view>
+        </view>
+      </view>
+      <view class="friend-stats">
+        <text>总邀请0人，今日邀请0人</text>
+        <text>当前步数加成0%，明天步数加成0%</text>
+      </view>
+    </view>
+    <view class="friend-more"><text>查看</text><text>更多›</text></view>
+  </view>
+
+  <!-- 每日兑换提醒 -->
+  <view class="reminder-card">
+    <view class="reminder-info">
+      <view class="reminder-title">每日兑换提醒</view>
+      <view class="reminder-sub">兑换券可兑换礼物，记得每天来看看哟~</view>
+    </view>
+    <view class="switch"><view class="switch-knob"></view></view>
+  </view>
+
+  <!-- 步数挑战 -->
+  <view class="challenge-card">
+    <view class="challenge-head">
+      <view class="challenge-bar"></view>
+      <text class="challenge-title">步数挑战</text>
+      <text class="challenge-date">2026-11-18开始</text>
+      <text class="challenge-more">更多›</text>
+    </view>
+    <view class="challenge-body">
+      <view class="runners">
+        <view class="grass"></view>
+        <view class="runner runner-blue">
+          <view class="r-head"></view>
+          <view class="r-body"></view>
+          <view class="r-leg leg-a"></view>
+          <view class="r-leg leg-b"></view>
+          <view class="r-arm arm-a"></view>
+          <view class="r-arm arm-b"></view>
+        </view>
+        <view class="runner runner-orange">
+          <view class="r-head"></view>
+          <view class="r-body"></view>
+          <view class="r-leg leg-a"></view>
+          <view class="r-leg leg-b"></view>
+          <view class="r-arm arm-a"></view>
+          <view class="r-arm arm-b"></view>
+        </view>
+      </view>
+      <view class="challenge-info">
+        <view class="goal">目标步数<text class="goal-num">12000</text>步</view>
+        <view class="deposit">挑战保证金0.00兑换券</view>
+        <view class="joined">已有309人参加</view>
+      </view>
+    </view>
+    <view class="challenge-btn">已参赛，邀请好友</view>
+  </view>
+</view>

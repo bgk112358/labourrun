@@ -1,0 +1,45 @@
+.nav-bar {
+  position: relative;
+  z-index: 20;
+  width: 100%;
+}
+.nav-status {
+  width: 100%;
+}
+.nav-content {
+  position: relative;
+  width: 100%;
+}
+.nav-back {
+  position: absolute;
+  left: 24rpx;
+  top: 0;
+  bottom: 0;
+  width: 80rpx;
+  display: flex;
+  align-items: center;
+  z-index: 2;
+}
+.nav-back-hover { opacity: .6; }
+.chevron {
+  width: 22rpx;
+  height: 22rpx;
+  border-left: 4rpx solid currentColor;
+  border-bottom: 4rpx solid currentColor;
+  transform: rotate(45deg);
+  margin-left: 8rpx;
+}
+.nav-title {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34rpx;
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: none;
+}

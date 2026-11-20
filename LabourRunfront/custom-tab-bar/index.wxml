@@ -1,0 +1,31 @@
+<view class="tabbar" style="padding-bottom: {{safeBottom}}px;">
+  <view class="tabbar-inner">
+    <view
+      class="tab-item {{selected === index ? 'active' : ''}}"
+      wx:for="{{list}}"
+      wx:key="pagePath"
+      data-path="{{item.pagePath}}"
+      data-index="{{index}}"
+      bindtap="switchTab"
+      hover-class="tab-hover"
+    >
+      <view class="tab-icon">
+        <block wx:if="{{index === 0}}">
+          <view class="roof"></view>
+          <view class="house"></view>
+        </block>
+        <block wx:elif="{{index === 1}}">
+          <view class="sq sq-tl"></view>
+          <view class="sq sq-tr"></view>
+          <view class="sq sq-bl"></view>
+          <view class="sq sq-br"></view>
+        </block>
+        <block wx:else>
+          <view class="person-head"></view>
+          <view class="person-body"></view>
+        </block>
+      </view>
+      <text class="tab-text">{{item.text}}</text>
+    </view>
+  </view>
+</view>
