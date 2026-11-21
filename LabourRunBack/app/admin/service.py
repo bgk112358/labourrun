@@ -21,9 +21,12 @@ from ..services.common import (
     get_current_activity,
     get_current_challenge,
 )
+from ..services.coupon_service import serialize_account
+from ..services.reward_service import normalize_reward_code
 from ..timeutil import (
     format_cents,
     start_of_today_shanghai_utc_iso,
+    today_shanghai,
     utc_now_iso,
 )
 from .audit import client_ip, write_audit
@@ -269,9 +272,13 @@ def _mask_phone(phone: str) -> str:
     return "****"
 
 
-def process_activity_image(
+def _process_upload_image(
     settings: Settings,
     data: bytes,
+    width: int,
+    height: int,
+    subdir: str,
+    label: str,
 ) -> dict[str, Any]:
     try:
         from PIL import Image, ImageOps, UnidentifiedImageError
@@ -279,7 +286,7 @@ def process_activity_image(
         raise AppError(
             ErrorCode.CONFIG_ERROR,
             500,
-            "服务端未安装 Pillow，无法处理活动图片",
+            f"服务端未安装 Pillow，无法处理{label}图片",
         ) from exc
 
     if not data:
@@ -295,13 +302,11 @@ def process_activity_image(
             "图片不能超过 10MB",
         )
 
-    width = settings.activity_image_width
-    height = settings.activity_image_height
     if width <= 0 or height <= 0:
         raise AppError(
             ErrorCode.CONFIG_ERROR,
             500,
-            "活动图片尺寸配置无效",
+            f"{label}图片尺寸配置无效",
         )
 
     try:
@@ -359,16 +364,16 @@ def process_activity_image(
             "图片处理失败",
         ) from exc
 
-    upload_dir = Path(settings.upload_dir) / "activity"
+    upload_dir = Path(settings.upload_dir) / subdir
     upload_dir.mkdir(parents=True, exist_ok=True)
     filename = f"{uuid4().hex}.jpg"
     (upload_dir / filename).write_bytes(output)
 
     base_url = settings.public_base_url.rstrip("/")
     image_url = (
-        f"{base_url}/uploads/activity/{filename}"
+        f"{base_url}/uploads/{subdir}/{filename}"
         if base_url
-        else f"/uploads/activity/{filename}"
+        else f"/uploads/{subdir}/{filename}"
     )
     return {
         "image_url": image_url,
@@ -376,6 +381,34 @@ def process_activity_image(
         "height": height,
         "bytes": len(output),
     }
+
+
+def process_activity_image(
+    settings: Settings,
+    data: bytes,
+) -> dict[str, Any]:
+    return _process_upload_image(
+        settings,
+        data,
+        settings.activity_image_width,
+        settings.activity_image_height,
+        "activity",
+        "活动",
+    )
+
+
+def process_reward_image(
+    settings: Settings,
+    data: bytes,
+) -> dict[str, Any]:
+    return _process_upload_image(
+        settings,
+        data,
+        400,
+        400,
+        "reward",
+        "奖品",
+    )
 
 
 def _registration_where(
@@ -976,3 +1009,330 @@ def create_admin(
         ).fetchone()
 
     return admin_public(row)
+
+
+def _reward_admin(row: sqlite3.Row) -> dict[str, Any]:
+    return {
+        "id": row["id"],
+        "activity_id": row["activity_id"],
+        "name": row["name"],
+        "image_url": row["image_url"],
+        "coupon_cost": format_cents(row["coupon_cost_cents"]),
+        "sort_order": int(row["sort_order"]),
+        "active": bool(row["active"]),
+        "updated_at": row["updated_at"],
+    }
+
+
+def _reward_snapshot(row: sqlite3.Row) -> dict[str, Any]:
+    return {
+        "id": row["id"],
+        "name": row["name"],
+        "imageUrl": row["image_url"],
+        "couponCost": format_cents(row["coupon_cost_cents"]),
+        "sortOrder": int(row["sort_order"]),
+        "active": bool(row["active"]),
+    }
+
+
+def list_rewards(settings: Settings) -> dict[str, Any]:
+    with get_conn(settings) as conn:
+        activity = get_current_activity(conn)
+        if activity is None:
+            return {"list": []}
+        rows = conn.execute(
+            """
+            SELECT *
+            FROM rewards
+            WHERE activity_id = ?
+            ORDER BY sort_order ASC, id ASC
+            """,
+            (activity["id"],),
+        ).fetchall()
+    return {"list": [_reward_admin(row) for row in rows]}
+
+
+def update_reward(
+    settings: Settings,
+    request: Request,
+    admin: sqlite3.Row,
+    reward_id: str,
+    body: Any,
+) -> dict[str, Any]:
+    cost = _parse_coupons_to_cents(body.coupon_cost)
+    if cost <= 0:
+        raise AppError(
+            ErrorCode.VALIDATION_ERROR,
+            400,
+            "所需兑换券必须大于 0",
+        )
+
+    now = utc_now_iso()
+    with transaction(settings) as conn:
+        row = conn.execute(
+            "SELECT * FROM rewards WHERE id = ?",
+            (reward_id,),
+        ).fetchone()
+        if row is None:
+            raise AppError(
+                ErrorCode.ADMIN_REWARD_NOT_FOUND,
+                404,
+                "奖品不存在",
+            )
+        before = _reward_snapshot(row)
+        conn.execute(
+            """
+            UPDATE rewards
+            SET name = ?, image_url = ?, coupon_cost_cents = ?,
+                sort_order = ?, active = ?, updated_at = ?
+            WHERE id = ?
+            """,
+            (
+                body.name,
+                body.image_url,
+                cost,
+                body.sort_order,
+                1 if body.active else 0,
+                now,
+                reward_id,
+            ),
+        )
+        updated = conn.execute(
+            "SELECT * FROM rewards WHERE id = ?",
+            (reward_id,),
+        ).fetchone()
+        write_audit(
+            conn,
+            request,
+            admin["id"],
+            admin["username"],
+            "update",
+            "reward",
+            reward_id,
+            before,
+            _reward_snapshot(updated),
+        )
+    return _reward_admin(updated)
+
+
+def get_reward_redemption(
+    settings: Settings,
+    request: Request,
+    admin: sqlite3.Row,
+    code: str,
+) -> dict[str, Any]:
+    normalized = normalize_reward_code(code)
+    with transaction(settings) as conn:
+        redemption = conn.execute(
+            """
+            SELECT rr.*, a.name AS activity_name
+            FROM reward_redemptions rr
+            JOIN activities a ON a.id = rr.activity_id
+            WHERE rr.code = ?
+            """,
+            (normalized,),
+        ).fetchone()
+        if redemption is None:
+            raise AppError(
+                ErrorCode.ADMIN_REWARD_REDEMPTION_NOT_FOUND,
+                404,
+                "兑换码不存在",
+            )
+
+        write_audit(
+            conn,
+            request,
+            admin["id"],
+            admin["username"],
+            "lookup",
+            "reward_redemption",
+            redemption["id"],
+        )
+
+        user = conn.execute(
+            "SELECT * FROM users WHERE id = ?",
+            (redemption["user_id"],),
+        ).fetchone()
+        registration = conn.execute(
+            "SELECT * FROM registrations WHERE id = ?",
+            (redemption["registration_id"],),
+        ).fetchone()
+        account = conn.execute(
+            "SELECT * FROM coupon_accounts WHERE user_id = ?",
+            (redemption["user_id"],),
+        ).fetchone()
+
+        daily_cap = _config_int(conn, "daily_cap_steps", 10000)
+        steps_per_coupon = _config_int(
+            conn, "steps_per_coupon", 10000
+        )
+        today = today_shanghai()
+        today_row = conn.execute(
+            """
+            SELECT *
+            FROM daily_steps
+            WHERE user_id = ? AND stat_date = ?
+            """,
+            (redemption["user_id"], today),
+        ).fetchone()
+        today_steps = (
+            max(int(today_row["steps"]), 0)
+            if today_row is not None
+            else 0
+        )
+        today_exchanged = (
+            max(int(today_row["exchanged_steps"]), 0)
+            if today_row is not None
+            else 0
+        )
+        today_convertible = max(
+            min(today_steps, daily_cap) - today_exchanged,
+            0,
+        )
+        totals = conn.execute(
+            """
+            SELECT
+                COALESCE(SUM(steps), 0) AS total_steps,
+                COALESCE(SUM(exchanged_steps), 0) AS total_exchanged
+            FROM daily_steps
+            WHERE user_id = ?
+            """,
+            (redemption["user_id"],),
+        ).fetchone()
+        daily_steps = conn.execute(
+            """
+            SELECT stat_date, steps, exchanged_steps
+            FROM daily_steps
+            WHERE user_id = ?
+            ORDER BY stat_date DESC
+            LIMIT 14
+            """,
+            (redemption["user_id"],),
+        ).fetchall()
+        redemptions = conn.execute(
+            """
+            SELECT code, reward_name, coupon_cost_cents, created_at
+            FROM reward_redemptions
+            WHERE user_id = ?
+            ORDER BY created_at DESC, id DESC
+            """,
+            (redemption["user_id"],),
+        ).fetchall()
+        ledger = conn.execute(
+            """
+            SELECT *
+            FROM coupon_ledger
+            WHERE user_id = ?
+            ORDER BY created_at DESC, id DESC
+            LIMIT 20
+            """,
+            (redemption["user_id"],),
+        ).fetchall()
+
+    full_phone = admin["role"] == "super_admin"
+
+    def phone_view(phone: str) -> dict[str, Any]:
+        return {
+            "phone": phone if full_phone else None,
+            "phone_masked": _mask_phone(phone),
+        }
+
+    redeemer = {
+        "real_name": redemption["real_name"],
+        "company": redemption["company"],
+        **phone_view(redemption["phone"]),
+    }
+
+    registration_data = None
+    if registration is not None:
+        registration_data = {
+            "id": registration["id"],
+            "real_name": registration["real_name"],
+            "company": registration["company"],
+            "status": registration["status"],
+            "created_at": registration["created_at"],
+            "updated_at": registration["updated_at"],
+            "cancelled_at": registration["cancelled_at"],
+            **phone_view(registration["phone"]),
+        }
+
+    return {
+        "redemption": {
+            "id": redemption["id"],
+            "code": redemption["code"],
+            "reward_id": redemption["reward_id"],
+            "reward_name": redemption["reward_name"],
+            "coupon_cost": format_cents(
+                redemption["coupon_cost_cents"]
+            ),
+            "activity_name": redemption["activity_name"],
+            "created_at": redemption["created_at"],
+        },
+        "redeemer": redeemer,
+        "user": {
+            "id": user["id"],
+            "nickname": user["nickname"],
+            "created_at": user["created_at"],
+        },
+        "registration": registration_data,
+        "coupon_account": serialize_account(account),
+        "step_summary": {
+            "today_steps": today_steps,
+            "today_exchanged_steps": today_exchanged,
+            "today_convertible_steps": today_convertible,
+            "total_steps": int(totals["total_steps"]),
+            "total_exchanged_steps": int(totals["total_exchanged"]),
+            "daily_cap_steps": daily_cap,
+            "steps_per_coupon": steps_per_coupon,
+        },
+        "daily_steps": [
+            {
+                "stat_date": row["stat_date"],
+                "steps": int(row["steps"]),
+                "exchanged_steps": int(row["exchanged_steps"]),
+            }
+            for row in daily_steps
+        ],
+        "redemptions": [
+            {
+                "code": row["code"],
+                "reward_name": row["reward_name"],
+                "coupon_cost": format_cents(
+                    row["coupon_cost_cents"]
+                ),
+                "created_at": row["created_at"],
+            }
+            for row in redemptions
+        ],
+        "ledger": [
+            {
+                "id": row["id"],
+                "type": row["type"],
+                "amount": format_cents(row["amount_cents"]),
+                "balance_after": format_cents(
+                    row["balance_after_cents"]
+                ),
+                "ref_type": row["ref_type"],
+                "ref_id": row["ref_id"],
+                "created_at": row["created_at"],
+            }
+            for row in ledger
+        ],
+    }
+
+
+def _config_int(
+    conn: sqlite3.Connection,
+    key: str,
+    default: int,
+) -> int:
+    row = conn.execute(
+        "SELECT value FROM app_config WHERE key = ?",
+        (key,),
+    ).fetchone()
+    if row is None:
+        return default
+    try:
+        return int(row["value"])
+    except (TypeError, ValueError):
+        return default

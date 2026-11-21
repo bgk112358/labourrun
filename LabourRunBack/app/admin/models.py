@@ -215,3 +215,135 @@ class DashboardData(APIModel):
     registration_count: int
     today_registration_count: int
     recent_audit_logs: list[AuditLogItem] = Field(default_factory=list)
+
+
+class RewardAdminOut(APIModel):
+    id: str
+    activity_id: str
+    name: str
+    image_url: str | None = None
+    coupon_cost: str
+    sort_order: int
+    active: bool
+    updated_at: str
+
+
+class RewardAdminList(APIModel):
+    items: list[RewardAdminOut] = Field(
+        default_factory=list,
+        alias="list",
+    )
+
+
+class RewardAdminUpdate(APIModel):
+    name: str = Field(min_length=1, max_length=50)
+    coupon_cost: str = Field(pattern=r"^\d+(\.\d{1,2})?$")
+    image_url: str | None = Field(default=None, max_length=500)
+    sort_order: int = Field(ge=0, le=9999)
+    active: bool
+
+    @field_validator("name", mode="before")
+    @classmethod
+    def strip_name(cls, value):
+        return value.strip() if isinstance(value, str) else value
+
+    @field_validator("image_url", mode="before")
+    @classmethod
+    def normalize_image_url(cls, value):
+        if isinstance(value, str):
+            value = value.strip()
+            return value or None
+        return value
+
+
+class RewardImageOut(APIModel):
+    image_url: str
+    width: int
+    height: int
+    bytes: int
+
+
+class RewardRedemptionInfo(APIModel):
+    id: str
+    code: str
+    reward_id: str
+    reward_name: str
+    coupon_cost: str
+    activity_name: str
+    created_at: str
+
+
+class RewardRedeemerInfo(APIModel):
+    real_name: str
+    phone: str | None = None
+    phone_masked: str
+    company: str
+
+
+class RewardUserInfo(APIModel):
+    id: str
+    nickname: str | None = None
+    created_at: str
+
+
+class RewardRegistrationInfo(APIModel):
+    id: str
+    real_name: str
+    phone: str | None = None
+    phone_masked: str
+    company: str
+    status: str
+    created_at: str
+    updated_at: str
+    cancelled_at: str | None = None
+
+
+class RewardCouponAccount(APIModel):
+    balance: str
+    total_earned: str
+    total_spent: str
+
+
+class RewardStepSummary(APIModel):
+    today_steps: int
+    today_exchanged_steps: int
+    today_convertible_steps: int
+    total_steps: int
+    total_exchanged_steps: int
+    daily_cap_steps: int
+    steps_per_coupon: int
+
+
+class RewardDailyStep(APIModel):
+    stat_date: str
+    steps: int
+    exchanged_steps: int
+
+
+class RewardRedemptionHistory(APIModel):
+    code: str
+    reward_name: str
+    coupon_cost: str
+    created_at: str
+
+
+class RewardLedgerItem(APIModel):
+    id: str
+    type: str
+    amount: str
+    balance_after: str
+    ref_type: str | None = None
+    ref_id: str | None = None
+    created_at: str
+
+
+class RewardLookupData(APIModel):
+    redemption: RewardRedemptionInfo
+    redeemer: RewardRedeemerInfo
+    user: RewardUserInfo
+    registration: RewardRegistrationInfo | None = None
+    coupon_account: RewardCouponAccount
+    step_summary: RewardStepSummary
+    daily_steps: list[RewardDailyStep] = Field(default_factory=list)
+    redemptions: list[RewardRedemptionHistory] = Field(default_factory=list)
+    ledger: list[RewardLedgerItem] = Field(default_factory=list)

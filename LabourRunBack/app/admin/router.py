@@ -26,6 +26,11 @@ from .models import (
     DashboardData,
     RegistrationAdminDetail,
     RegistrationAdminPage,
+    RewardAdminList,
+    RewardAdminOut,
+    RewardAdminUpdate,
+    RewardImageOut,
+    RewardLookupData,
 )
 
 router = APIRouter()
@@ -207,6 +212,75 @@ def get_registration(
     return ok(
         request,
         service.get_registration(settings, admin, registration_id),
+    )
+
+
+@router.get("/rewards", response_model=ApiResponse[RewardAdminList])
+def list_rewards(
+    request: Request,
+    admin: sqlite3.Row = Depends(get_current_admin),
+    settings: Settings = Depends(get_settings),
+):
+    return ok(request, service.list_rewards(settings))
+
+
+@router.patch(
+    "/rewards/{reward_id}",
+    response_model=ApiResponse[RewardAdminOut],
+)
+def update_reward(
+    reward_id: str,
+    body: RewardAdminUpdate,
+    request: Request,
+    admin: sqlite3.Row = Depends(get_current_admin),
+    settings: Settings = Depends(get_settings),
+):
+    return ok(
+        request,
+        service.update_reward(
+            settings,
+            request,
+            admin,
+            reward_id,
+            body,
+        ),
+    )
+
+
+@router.post(
+    "/rewards/image",
+    response_model=ApiResponse[RewardImageOut],
+)
+async def upload_reward_image(
+    request: Request,
+    admin: sqlite3.Row = Depends(get_current_admin),
+    settings: Settings = Depends(get_settings),
+):
+    content = await request.body()
+    return ok(
+        request,
+        service.process_reward_image(settings, content),
+    )
+
+
+@router.get(
+    "/redemptions/{code}",
+    response_model=ApiResponse[RewardLookupData],
+)
+def get_reward_redemption(
+    code: str,
+    request: Request,
+    admin: sqlite3.Row = Depends(get_current_admin),
+    settings: Settings = Depends(get_settings),
+):
+    return ok(
+        request,
+        service.get_reward_redemption(
+            settings,
+            request,
+            admin,
+            code,
+        ),
     )
 
 

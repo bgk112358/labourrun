@@ -1,6 +1,7 @@
 const auth = require('../../utils/auth');
 const api = require('../../utils/api');
 const ui = require('../../utils/ui');
+const format = require('../../utils/format');
 
 Page({
   data: {
@@ -20,14 +21,18 @@ Page({
     statusText: '',
     isRegistered: false,
     isCancelled: false,
+    rewards: [],
+    redeemingRewardId: '',
   },
 
   onLoad() {
     this.requesting = false;
     this.pending = null;
+    this.rewardRequestIds = {};
   },
 
   onShow() {
+    console.log('[home] onShow');
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ selected: 0 });
     }
@@ -35,6 +40,7 @@ Page({
   },
 
   onPullDownRefresh() {
+    console.log('[home] pull down refresh');
     this.loadData({ silent: true }).then(
       () => wx.stopPullDownRefresh(),
       () => wx.stopPullDownRefresh()
@@ -43,7 +49,12 @@ Page({
 
   loadData(options) {
     const silent = options && options.silent;
+    console.log('[home] loadData start', {
+      silent: Boolean(silent),
+      requesting: this.requesting,
+    });
     if (this.requesting) {
+      console.log('[home] loadData reuse pending request');
       return this.pending || Promise.resolve();
     }
     this.requesting = true;
@@ -52,9 +63,11 @@ Page({
     this.pending = auth
       .ensureLogin()
       .then(function () {
+        console.log('[home] login ready, requesting /home');
         return api.getHome();
       })
       .then((data) => {
+        console.log('[home] loadData success');
         const activity = data.activity || {};
         const registration = data.registration || null;
         const form = registration
@@ -74,6 +87,7 @@ Page({
               rules: activity.rules || [],
               registration,
               form,
+              rewards: data.rewards || [],
               loading: false,
               error: '',
               bannerError: false,
@@ -83,6 +97,7 @@ Page({
         );
       })
       .catch((error) => {
+        console.error('[home] loadData fail', error);
         this.requesting = false;
         this.pending = null;
         this.setData({
@@ -194,6 +209,7 @@ Page({
         this.applyRegistration(data);
         this.setData({ submitting: false });
         ui.toast(wasRegistered ? '保存成功' : '报名成功');
+        this.loadData({ silent: true });
       })
       .catch((error) => {
         this.setData({ submitting: false });
@@ -226,12 +242,124 @@ Page({
           this.applyRegistration(data);
           this.setData({ submitting: false });
           ui.toast('已取消报名');
+          this.loadData({ silent: true });
         })
         .catch((error) => {
           this.setData({ submitting: false });
           ui.showError(error);
         });
     });
+  },
+
+  onRewardTap(event) {
+    if (this.data.redeemingRewardId) return;
+    const rewardId = event.currentTarget.dataset.id;
+    const reward = (this.data.rewards || []).find(
+      (item) => item.id === rewardId
+    );
+    if (!reward) return;
+
+    if (reward.redeemed) {
+      this.showRewardDetail(reward);
+      return;
+    }
+    if (!reward.canRedeem) {
+      ui.toast(reward.disabledReason || '暂不可兑换');
+      return;
+    }
+
+    ui.confirm(
+      '确认兑换',
+      '使用 ' +
+        reward.couponCost +
+        ' 兑换券兑换「' +
+        reward.name +
+        '」？'
+    ).then((confirmed) => {
+      if (confirmed) this.doRedeemReward(reward);
+    });
+  },
+
+  doRedeemReward(reward) {
+    if (this.data.redeemingRewardId) return;
+    if (!this.rewardRequestIds) this.rewardRequestIds = {};
+    let requestId = this.rewardRequestIds[reward.id];
+    if (!requestId) {
+      requestId =
+        'reward-' +
+        Date.now() +
+        '-' +
+        Math.random().toString(36).slice(2, 8);
+      this.rewardRequestIds[reward.id] = requestId;
+    }
+
+    this.setData({ redeemingRewardId: reward.id });
+    auth
+      .ensureLogin()
+      .then(() => api.redeemReward(reward.id, { requestId }))
+      .then((data) => {
+        delete this.rewardRequestIds[reward.id];
+        const redemption = (data && data.redemption) || {};
+        const rewards = (this.data.rewards || []).map((item) => {
+          if (item.id !== reward.id) return item;
+          return Object.assign({}, item, {
+            redeemed: true,
+            redemptionCode: redemption.code || '',
+            redeemedAt: redemption.createdAt || '',
+            redemptionRewardName:
+              redemption.rewardName || item.name,
+            redemptionCouponCost:
+              redemption.couponAmount || item.couponCost,
+            canRedeem: false,
+            disabledReason: null,
+          });
+        });
+        this.setData({
+          rewards,
+          redeemingRewardId: '',
+        });
+        ui.toast('兑换成功');
+      })
+      .catch((error) => {
+        if (error && error.code) {
+          delete this.rewardRequestIds[reward.id];
+        }
+        this.setData({ redeemingRewardId: '' });
+        ui.showError(error);
+      });
+  },
+
+  showRewardDetail(reward) {
+    const code = reward.redemptionCode || '';
+    if (!code) {
+      ui.toast('兑换码获取中，请下拉刷新');
+      return;
+    }
+    const rewardName =
+      reward.redemptionRewardName || reward.name || '';
+    wx.showModal({
+      title: rewardName || '奖励详情',
+      content:
+        '兑换码：' +
+        code +
+        '\n奖励：' +
+        rewardName +
+        (reward.redeemedAt
+          ? '\n兑换时间：' + format.formatTime(reward.redeemedAt)
+          : ''),
+      showCancel: false,
+      confirmText: '知道了',
+    });
+  },
+
+  onRewardImageError(event) {
+    const rewardId = event.currentTarget.dataset.id;
+    const rewards = (this.data.rewards || []).map((item) =>
+      item.id === rewardId
+        ? Object.assign({}, item, { imageError: true })
+        : item
+    );
+    this.setData({ rewards });
   },
 
   onBannerError() {

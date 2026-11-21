@@ -92,7 +92,10 @@ CREATE TABLE IF NOT EXISTS coupon_ledger (
     id TEXT PRIMARY KEY,
     user_id TEXT NOT NULL REFERENCES users(id),
     type TEXT NOT NULL
-        CHECK (type IN ('exchange', 'challenge_deposit', 'refund', 'adjust')),
+        CHECK (type IN (
+            'exchange', 'reward', 'challenge_deposit',
+            'refund', 'adjust'
+        )),
     amount_cents INTEGER NOT NULL,
     balance_after_cents INTEGER NOT NULL,
     ref_type TEXT,
@@ -102,6 +105,50 @@ CREATE TABLE IF NOT EXISTS coupon_ledger (
 
 CREATE INDEX IF NOT EXISTS ix_ledger_user_created
     ON coupon_ledger(user_id, created_at DESC);
+
+CREATE TABLE IF NOT EXISTS rewards (
+    id TEXT PRIMARY KEY,
+    activity_id TEXT NOT NULL REFERENCES activities(id),
+    name TEXT NOT NULL,
+    image_url TEXT,
+    coupon_cost_cents INTEGER NOT NULL
+        CHECK (coupon_cost_cents > 0),
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    active INTEGER NOT NULL DEFAULT 1
+        CHECK (active IN (0, 1)),
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS ix_rewards_activity
+    ON rewards(activity_id, sort_order, id);
+
+CREATE TABLE IF NOT EXISTS reward_redemptions (
+    id TEXT PRIMARY KEY,
+    code TEXT NOT NULL UNIQUE,
+    user_id TEXT NOT NULL REFERENCES users(id),
+    registration_id TEXT NOT NULL REFERENCES registrations(id),
+    reward_id TEXT NOT NULL REFERENCES rewards(id),
+    activity_id TEXT NOT NULL REFERENCES activities(id),
+    reward_name TEXT NOT NULL,
+    coupon_cost_cents INTEGER NOT NULL,
+    real_name TEXT NOT NULL,
+    phone TEXT NOT NULL,
+    company TEXT NOT NULL,
+    request_id TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'success'
+        CHECK (status IN ('success')),
+    created_at TEXT NOT NULL
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS ux_reward_user_reward
+    ON reward_redemptions(user_id, reward_id);
+CREATE UNIQUE INDEX IF NOT EXISTS ux_reward_user_request
+    ON reward_redemptions(user_id, request_id);
+CREATE INDEX IF NOT EXISTS ix_reward_user_created
+    ON reward_redemptions(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS ix_reward_activity_created
+    ON reward_redemptions(activity_id, created_at DESC);
 
 CREATE TABLE IF NOT EXISTS challenges (
     id TEXT PRIMARY KEY,

@@ -96,6 +96,42 @@
     </view>
   </view>
 
+  <view class="reward-section" wx:if="{{rewards.length}}">
+    <view class="section-title">
+      <view class="title-line"></view>
+      <text class="title-text">奖品兑换</text>
+      <view class="title-line"></view>
+    </view>
+    <view class="reward-list">
+      <view class="reward-row" wx:for="{{rewards}}" wx:key="id">
+        <image
+          wx:if="{{item.imageUrl && !item.imageError}}"
+          class="reward-image"
+          src="{{item.imageUrl}}"
+          mode="aspectFill"
+          data-id="{{item.id}}"
+          binderror="onRewardImageError"
+        />
+        <view wx:else class="reward-image reward-placeholder">
+          <text class="reward-placeholder-mark">奖</text>
+        </view>
+
+        <view class="reward-main">
+          <view class="reward-name">{{item.name}}</view>
+          <view class="reward-cost">{{item.couponCost}} 兑换券</view>
+        </view>
+
+        <view
+          class="reward-action {{item.redeemed ? 'is-detail' : (item.canRedeem ? '' : 'is-disabled')}} {{redeemingRewardId == item.id ? 'is-loading' : ''}}"
+          data-id="{{item.id}}"
+          bindtap="onRewardTap"
+        >
+          {{redeemingRewardId == item.id ? '兑换中...' : (item.redeemed ? '奖励详情' : '去兑换')}}
+        </view>
+      </view>
+    </view>
+  </view>
+
   <view class="submit-bar">
     <button
       class="submit-btn"

@@ -6,7 +6,12 @@ function mapItem(item) {
   const amount = item.amount || '0.00';
   return {
     id: item.id,
-    typeText: item.type === 'exchange' ? '步数兑换' : item.type,
+    typeText:
+      item.type === 'exchange'
+        ? '步数兑换'
+        : item.type === 'reward'
+          ? '奖品兑换'
+          : item.type,
     amount: format.formatMoney(amount),
     balanceAfter: format.formatMoney(item.balanceAfter),
     timeText: format.formatTime(item.createdAt),

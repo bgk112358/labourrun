@@ -24,8 +24,16 @@ App({
     this.globalData.navContentHeight = navContentHeight
 
     // 启动时预热登录；页面 onShow 仍会兜底调用 ensureLogin
-    this.loginReady = auth.ensureLogin().catch(function () {
-      return null
-    })
+    console.log('[app] launch')
+    this.loginReady = auth
+      .ensureLogin()
+      .then(function (user) {
+        console.log('[app] login ok', user && user.id)
+        return user
+      })
+      .catch(function (error) {
+        console.error('[app] login fail', error)
+        return null
+      })
   }
 })

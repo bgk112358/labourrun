@@ -65,30 +65,48 @@ function getLoginCode() {
 
 function login(options) {
   const force = options && options.force;
+  console.log('[auth] login start', {
+    force: Boolean(force),
+    useMockLogin: config.useMockLogin,
+    hasToken: Boolean(getToken()),
+    loggedIn: isLoggedIn(),
+  });
   if (!force && isLoggedIn()) {
+    console.log('[auth] reuse existing session');
     return Promise.resolve(getUser());
   }
   if (loginPromise) {
+    console.log('[auth] reuse pending login promise');
     return loginPromise;
   }
 
   loginPromise = getLoginCode()
-    .then((code) =>
-      request({
+    .then((code) => {
+      console.log(
+        '[auth] got login code',
+        String(code || '').slice(0, 12)
+      );
+      console.log('[auth] posting /auth/login');
+      return request({
         url: '/auth/login',
         method: 'POST',
         data: { code },
         auth: false,
         retry: false,
-      })
-    )
+      });
+    })
     .then(
       (data) => {
+        console.log(
+          '[auth] login success',
+          data && data.user && data.user.id
+        );
         setSession(data);
         loginPromise = null;
         return data.user;
       },
       (error) => {
+        console.error('[auth] login fail', error);
         loginPromise = null;
         throw error;
       }

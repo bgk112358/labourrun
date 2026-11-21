@@ -298,6 +298,83 @@
   color: #999999;
 }
 
+/* 奖品兑换 */
+.reward-section {
+  margin-top: 8rpx;
+}
+.reward-list {
+  padding: 0 30rpx;
+}
+.reward-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 18rpx;
+  padding: 20rpx;
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, .03);
+}
+.reward-image {
+  flex: none;
+  width: 150rpx;
+  height: 150rpx;
+  border-radius: 14rpx;
+  background: #F1F5F9;
+}
+.reward-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #FFF3EE, #FFE1D8);
+}
+.reward-placeholder-mark {
+  font-size: 56rpx;
+  font-weight: 700;
+  color: #E93B33;
+}
+.reward-main {
+  flex: 1;
+  min-width: 0;
+  margin-left: 22rpx;
+}
+.reward-name {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  line-height: 1.4;
+}
+.reward-cost {
+  margin-top: 14rpx;
+  font-size: 26rpx;
+  color: #E93B33;
+}
+.reward-action {
+  flex: none;
+  min-width: 150rpx;
+  height: 64rpx;
+  margin-left: 16rpx;
+  padding: 0 18rpx;
+  border-radius: 32rpx;
+  background: linear-gradient(90deg, #F4533F, #F98C76);
+  color: #FFFFFF;
+  font-size: 26rpx;
+  line-height: 64rpx;
+  text-align: center;
+}
+.reward-action.is-detail {
+  border: 2rpx solid #F7C9BE;
+  background: #FFF3EE;
+  color: #E93B33;
+  line-height: 60rpx;
+}
+.reward-action.is-disabled {
+  background: #E5E7EB;
+  color: #9CA3AF;
+}
+.reward-action.is-loading {
+  opacity: .7;
+}
+
 .submit-bar {
   position: fixed;
   left: 0;

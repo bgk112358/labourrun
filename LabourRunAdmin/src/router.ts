@@ -6,6 +6,8 @@ const DashboardView = () => import('./views/DashboardView.vue')
 const ActivityView = () => import('./views/ActivityView.vue')
 const ChallengeView = () => import('./views/ChallengeView.vue')
 const RegistrationsView = () => import('./views/RegistrationsView.vue')
+const RewardsView = () => import('./views/RewardsView.vue')
+const RedemptionsView = () => import('./views/RedemptionsView.vue')
 const AuditLogsView = () => import('./views/AuditLogsView.vue')
 
 const router = createRouter({
@@ -44,6 +46,18 @@ const router = createRouter({
           name: 'registrations',
           component: RegistrationsView,
           meta: { title: '报名管理' },
+        },
+        {
+          path: 'rewards',
+          name: 'rewards',
+          component: RewardsView,
+          meta: { title: '奖励管理' },
+        },
+        {
+          path: 'redemptions',
+          name: 'redemptions',
+          component: RedemptionsView,
+          meta: { title: '奖励查询' },
         },
         {
           path: 'audit-logs',

@@ -179,6 +179,37 @@ async function main() {
   assert(ledger.list[0].amount === '0.66');
   log('ledger', ledger.list[0].balanceAfter);
 
+  const rewardRequestId = 'verify-reward-' + Date.now();
+  const reward = await api.redeemReward('rwd_water_bottle', {
+    requestId: rewardRequestId,
+  });
+  assert(/^LR-[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{8}$/.test(
+    reward.redemption.code
+  ));
+  assert(reward.redemption.rewardName === '运动水杯');
+  assert(reward.redemption.couponAmount === '0.50');
+  assert(reward.couponAccount.balance === '0.16');
+  log('reward redeem', reward.redemption.code);
+
+  const homeAfterReward = await api.getHome();
+  const redeemedReward = homeAfterReward.rewards.find(
+    (item) => item.id === 'rwd_water_bottle'
+  );
+  assert(redeemedReward.redeemed === true);
+  assert(redeemedReward.redemptionCode === reward.redemption.code);
+
+  let insufficient = null;
+  try {
+    await api.redeemReward('rwd_towel', {
+      requestId: 'verify-reward-insufficient-' + Date.now(),
+    });
+  } catch (error) {
+    insufficient = error;
+  }
+  assert(insufficient && insufficient.code === 3009);
+  assert(insufficient.message === '兑换券不足');
+  log('reward insufficient', insufficient.message);
+
   const me = await api.getMe();
   assert(me.id === user.id);
   const updatedMe = await api.updateMe({ nickname: '验收昵称' });

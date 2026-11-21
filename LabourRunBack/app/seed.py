@@ -8,6 +8,11 @@ from .timeutil import utc_now_iso
 
 ACTIVITY_ID = "act_default"
 CHALLENGE_ID = "ch_default"
+REWARD_IDS = (
+    "rwd_water_bottle",
+    "rwd_towel",
+    "rwd_backpack",
+)
 
 
 def seed(conn: sqlite3.Connection) -> None:
@@ -82,3 +87,61 @@ def seed(conn: sqlite3.Connection) -> None:
         WHERE key = 'daily_cap_steps' AND value = '12000'
         """
     )
+
+    rewards = [
+        (
+            REWARD_IDS[0],
+            ACTIVITY_ID,
+            "运动水杯",
+            None,
+            50,
+            1,
+            1,
+        ),
+        (
+            REWARD_IDS[1],
+            ACTIVITY_ID,
+            "运动毛巾",
+            None,
+            100,
+            2,
+            1,
+        ),
+        (
+            REWARD_IDS[2],
+            ACTIVITY_ID,
+            "运动背包",
+            None,
+            200,
+            3,
+            1,
+        ),
+    ]
+    for (
+        reward_id,
+        activity_id,
+        name,
+        image_url,
+        coupon_cost_cents,
+        sort_order,
+        active,
+    ) in rewards:
+        conn.execute(
+            """
+            INSERT OR IGNORE INTO rewards
+                (id, activity_id, name, image_url, coupon_cost_cents,
+                 sort_order, active, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                reward_id,
+                activity_id,
+                name,
+                image_url,
+                coupon_cost_cents,
+                sort_order,
+                active,
+                now,
+                now,
+            ),
+        )

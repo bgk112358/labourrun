@@ -12,6 +12,9 @@ import type {
   PageResult,
   RegistrationDetail,
   RegistrationItem,
+  RewardAdmin,
+  RewardImage,
+  RewardLookup,
 } from './types'
 
 export function login(
@@ -84,4 +87,25 @@ export function getAuditLogs(
 
 export function getAuditLog(id: string): Promise<AuditLogDetail> {
   return client.get(`/audit-logs/${id}`) as any
+}
+
+export function getRewards(): Promise<{ list: RewardAdmin[] }> {
+  return client.get('/rewards') as any
+}
+
+export function updateReward(
+  id: string,
+  payload: any,
+): Promise<RewardAdmin> {
+  return client.patch(`/rewards/${id}`, payload) as any
+}
+
+export function uploadRewardImage(file: File): Promise<RewardImage> {
+  return client.post('/rewards/image', file, {
+    headers: { 'Content-Type': file.type || 'application/octet-stream' },
+  }) as any
+}
+
+export function getRewardRedemption(code: string): Promise<RewardLookup> {
+  return client.get(`/redemptions/${encodeURIComponent(code)}`) as any
 }

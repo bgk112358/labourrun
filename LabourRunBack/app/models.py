@@ -94,9 +94,24 @@ class ChallengeOut(ChallengeSummaryOut):
     rules: list[ChallengeRuleOut] = Field(default_factory=list)
 
 
+class RewardOut(APIModel):
+    id: str
+    name: str
+    image_url: str | None = None
+    coupon_cost: str
+    redeemed: bool = False
+    redemption_code: str | None = None
+    redeemed_at: str | None = None
+    redemption_reward_name: str | None = None
+    redemption_coupon_cost: str | None = None
+    can_redeem: bool = True
+    disabled_reason: str | None = None
+
+
 class HomeData(APIModel):
     activity: ActivityOut
     registration: RegistrationOut | None = None
+    rewards: list[RewardOut] = Field(default_factory=list)
 
 
 class StepsData(APIModel):
@@ -128,6 +143,20 @@ class ExchangeData(APIModel):
     exchange: ExchangeResult
     coupon_account: CouponAccountOut
     step_summary: StepSummaryOut
+
+
+class RewardRedemptionOut(APIModel):
+    id: str
+    reward_id: str
+    code: str
+    reward_name: str
+    coupon_amount: str
+    created_at: str
+
+
+class RewardRedeemData(APIModel):
+    redemption: RewardRedemptionOut
+    coupon_account: CouponAccountOut
 
 
 class LedgerItem(APIModel):
@@ -205,6 +234,10 @@ class ExchangeRequest(APIModel):
         max_length=64,
         pattern=r"^[A-Za-z0-9_-]+$",
     )
+
+
+class RewardRedeemRequest(ExchangeRequest):
+    pass
 
 
 class MeUpdate(APIModel):

@@ -28,6 +28,7 @@ from .routers import (
     home,
     me,
     registrations,
+    rewards,
     steps,
 )
 
@@ -152,6 +153,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(coupons.router, prefix=prefix)
     app.include_router(me.router, prefix=prefix)
     app.include_router(challenges.router, prefix=prefix)
+    app.include_router(rewards.router, prefix=prefix)
     app.include_router(
         admin_router,
         prefix=f"{prefix}/admin",

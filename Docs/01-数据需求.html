@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LabourRun 小程序数据需求 v1.3</title>
+<title>LabourRun 小程序数据需求 v1.4</title>
 <style>
   :root {
     --ink: #1b2430;
@@ -41,7 +41,7 @@
       color: #8a96a6;
     }
     @top-right {
-      content: "v1.3";
+      content: "v1.4";
       font-size: 8pt;
       color: #8a96a6;
     }
@@ -367,12 +367,12 @@
     <h1 class="cover-title">数据需求说明</h1>
     <p class="cover-subtitle">步数挑战与兑换券小程序 · 前端界面数据梳理</p>
     <div class="cover-rule"></div>
-    <p class="cover-version">v1.3 <span>2026-11-20</span></p>
+    <p class="cover-version">v1.4 <span>2026-11-20</span></p>
 
     <table class="meta-table">
       <tbody>
         <tr><th>文档名称</th><td>数据需求说明</td></tr>
-        <tr><th>版本</th><td>v1.3</td></tr>
+        <tr><th>版本</th><td>v1.4</td></tr>
         <tr><th>日期</th><td>2026-11-20</td></tr>
         <tr><th>更新说明</th><td>新增首页活动主图；同步小程序与后台已实现状态</td></tr>
         <tr><th>依据</th><td><code>LabourRunMiniProgram</code> 小程序界面（首页、步数宝、我）</td></tr>
@@ -770,8 +770,50 @@
           <td>无</td>
           <td>兜底</td>
         </tr>
+        <tr>
+          <td>H-10</td>
+          <td>奖品列表 <code>rewards[]</code></td>
+          <td>后台奖励配置</td>
+          <td>首页下方“奖品兑换”区，三档三行；左侧 400×400 方图，右侧名称、所需兑换券、“去兑换”</td>
+          <td>onShow、兑换后刷新</td>
+          <td>核心（新增）</td>
+        </tr>
+        <tr>
+          <td>H-11</td>
+          <td>奖品兑换动作 <code>redeemReward</code></td>
+          <td>用户点击 + 后台</td>
+          <td>未报名提示“请先报名”；余额不足提示“兑换券不足”；足够则扣券并生成兑换码</td>
+          <td>点击、二次确认</td>
+          <td>核心（新增）</td>
+        </tr>
+        <tr>
+          <td>H-12</td>
+          <td>奖品兑换结果</td>
+          <td>后台</td>
+          <td>已兑换按钮变“奖励详情”，弹窗显示兑换码和奖励名称</td>
+          <td>点击查看</td>
+          <td>核心（新增）</td>
+        </tr>
+        <tr>
+          <td>H-13</td>
+          <td>奖品方图 <code>imageUrl</code></td>
+          <td>管理端上传</td>
+          <td>正方形展示图；无图时展示“奖”占位</td>
+          <td>后台保存后刷新</td>
+          <td>核心（新增）</td>
+        </tr>
       </tbody>
     </table>
+
+    <h4>奖品兑换规则</h4>
+    <ul>
+      <li>必须当前活动已报名且状态为 <code>registered</code>；未报名提示“请先报名”。</li>
+      <li>每个用户每档奖品限兑 1 次，三档可分别兑换；当前活动状态须为“进行中”。</li>
+      <li>兑换券不足提示“兑换券不足”；足够时扣减余额并生成唯一兑换码。</li>
+      <li>兑换码格式 <code>LR-XXXXXXXX</code>，服务端生成，可追溯到报名人和奖励名称。</li>
+      <li>兑换时记录奖励名称、所需券数、报名人姓名/手机号/单位快照；报名后续修改/取消不影响历史。</li>
+      <li>已兑换按钮变“奖励详情”，弹窗显示兑换码和奖励名称；奖品不限库存，兑换后不可撤销。</li>
+    </ul>
 
     <h4>报名数据规则</h4>
     <ul>
@@ -1209,7 +1251,7 @@
       <tbody>
         <tr><td><code>id</code></td><td>bigint/string</td><td>是</td><td>流水主键</td></tr>
         <tr><td><code>userId</code></td><td>string</td><td>是</td><td>用户 ID</td></tr>
-        <tr><td><code>type</code></td><td>enum</td><td>是</td><td><code>exchange</code> / <code>challenge_deposit</code> / <code>refund</code> / <code>adjust</code></td></tr>
+        <tr><td><code>type</code></td><td>enum</td><td>是</td><td><code>exchange</code> / <code>reward</code> / <code>challenge_deposit</code> / <code>refund</code> / <code>adjust</code></td></tr>
         <tr><td><code>amount</code></td><td>decimal(10,2)</td><td>是</td><td>变动金额，正负号表示增减</td></tr>
         <tr><td><code>balanceAfter</code></td><td>decimal(10,2)</td><td>是</td><td>变动后余额</td></tr>
         <tr><td><code>refType</code></td><td>string</td><td>否</td><td>关联业务类型</td></tr>
@@ -1257,6 +1299,43 @@
     <h3 id="section-4-8">4.8 每日提醒 Reminder（占位）</h3>
     <p>本期不建业务表，也不实现后台推送。UI 开关为纯占位状态；推送通道、模板、推送时间仅作为后续设计预留，待确认。</p>
 
+    <h3 id="section-4-9">4.9 奖品配置 Reward / 兑换记录 RewardRedemption</h3>
+    <p><strong>Reward</strong></p>
+    <table class="table">
+      <thead>
+        <tr><th>字段</th><th>类型</th><th>必填</th><th>来源</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>string</td><td>是</td><td>后台</td><td>奖品 ID</td></tr>
+        <tr><td><code>activityId</code></td><td>string</td><td>是</td><td>后台</td><td>所属活动</td></tr>
+        <tr><td><code>name</code></td><td>string</td><td>是</td><td>后台</td><td>奖励名称</td></tr>
+        <tr><td><code>imageUrl</code></td><td>string</td><td>否</td><td>管理端上传</td><td>400×400 方形图</td></tr>
+        <tr><td><code>couponCost</code></td><td>decimal(10,2)</td><td>是</td><td>后台</td><td>所需兑换券</td></tr>
+        <tr><td><code>sortOrder</code></td><td>int</td><td>是</td><td>后台</td><td>排序</td></tr>
+        <tr><td><code>active</code></td><td>bool</td><td>是</td><td>后台</td><td>是否启用</td></tr>
+      </tbody>
+    </table>
+
+    <p><strong>RewardRedemption</strong></p>
+    <table class="table">
+      <thead>
+        <tr><th>字段</th><th>类型</th><th>必填</th><th>来源</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>string</td><td>是</td><td>后台</td><td>兑换记录 ID</td></tr>
+        <tr><td><code>code</code></td><td>string</td><td>是</td><td>后台</td><td><code>LR-XXXXXXXX</code>，唯一</td></tr>
+        <tr><td><code>userId</code> / <code>registrationId</code></td><td>string</td><td>是</td><td>后台</td><td>用户与报名记录</td></tr>
+        <tr><td><code>rewardId</code> / <code>activityId</code></td><td>string</td><td>是</td><td>后台</td><td>奖品与活动</td></tr>
+        <tr><td><code>rewardName</code></td><td>string</td><td>是</td><td>后台</td><td>兑换时奖励名称快照</td></tr>
+        <tr><td><code>couponCost</code></td><td>decimal(10,2)</td><td>是</td><td>后台</td><td>兑换时券数快照</td></tr>
+        <tr><td><code>realName</code> / <code>phone</code> / <code>company</code></td><td>string</td><td>是</td><td>后台</td><td>兑换时报名人快照</td></tr>
+        <tr><td><code>requestId</code></td><td>string</td><td>是</td><td>前端/后台</td><td>幂等键</td></tr>
+        <tr><td><code>status</code></td><td>enum</td><td>是</td><td>后台</td><td><code>success</code></td></tr>
+        <tr><td><code>createdAt</code></td><td>datetime</td><td>是</td><td>后台</td><td>兑换时间</td></tr>
+      </tbody>
+    </table>
+    <p>唯一约束建议：<code>code</code> 唯一；<code>(userId, rewardId)</code> 唯一；<code>(userId, requestId)</code> 唯一。</p>
+
     <h2 id="section-5">5. 数据流与责任矩阵</h2>
 
     <h3 id="section-5-1">5.1 核心/占位数据责任</h3>
@@ -1270,6 +1349,7 @@
         <tr><td>头像、昵称</td><td>用户/微信</td><td>后台</td><td>我页</td><td>核心</td></tr>
         <tr><td>微信步数</td><td>微信运动</td><td>后台解密、存储、计算</td><td>步数宝表盘</td><td>核心</td></tr>
         <tr><td>兑换券余额</td><td>后台（兑换产生）</td><td>后台账户/流水</td><td>步数宝顶部条</td><td>核心</td></tr>
+        <tr><td>奖品配置/兑换码</td><td>后台管理端</td><td>后台（兑换码、报名人快照）</td><td>首页奖品兑换、奖励详情、后台奖励查询</td><td>核心（新增）</td></tr>
         <tr><td>步数挑战配置</td><td>后台</td><td>后台</td><td>步数宝挑战卡、更多页</td><td>核心（仅展示配置）</td></tr>
         <tr><td>挑战参与状态</td><td>前端静态（后续后台）</td><td>—</td><td>挑战卡按钮</td><td>占位（参赛流程不实现）</td></tr>
         <tr><td>排行榜</td><td>后台</td><td>后台</td><td>排行榜页</td><td>占位</td></tr>
@@ -1465,6 +1545,7 @@
       <li><strong>步数挑战</strong>：本期只展示后台配置（开始日期、目标步数、保证金、参与人数、详细规则）；参赛流程、保证金扣退、完成/失败判定、未参赛按钮均为占位，不实现。</li>
       <li><strong>“我”页 11 个菜单项</strong>：只梳理数据产生方和展示方，不实现目标页功能。</li>
       <li><strong>步数兑换规则</strong>：10000 步 = 1.00 兑换券；每天最多兑换 10000 步、最多获得 1.00 兑换券；向下取整，不足 100 步不计分；按整百步多次兑换，未兑换余数保留；达到上限提示“今日已达标”，次日 0 点重新计算；兑换券余额跨天累计。</li>
+      <li><strong>奖品兑换规则</strong>：三档奖品后台可配置；必须已报名且活动进行中；每档限兑 1 次；余额不足提示“兑换券不足”；兑换后扣券并生成唯一兑换码；记录奖励和报名人快照；后台按兑换码查询；已兑换按钮变“奖励详情”。</li>
     </ol>
 
     <h3 id="section-9-2">9.2 仍待确认</h3>
@@ -1486,6 +1567,7 @@
         <tr><td>v1.1</td><td>2026-11-17</td><td>每日提醒仅占位；挑战参赛流程占位；报名取消后可再次报名</td></tr>
         <tr><td>v1.2</td><td>2026-11-20</td><td>新增首页活动主图 imageUrl；同步后台/小程序已实现状态</td></tr>
         <tr><td>v1.3</td><td>2026-11-20</td><td>明确每日兑换上限 10000 步、当天 1.00 兑换券；向下取整；按整百步多次兑换，余数保留；达到上限提示“今日已达标”</td></tr>
+        <tr><td>v1.4</td><td>2026-11-20</td><td>新增首页奖品兑换、唯一兑换码、报名人快照、后台按码查询与奖励配置</td></tr>
       </tbody>
     </table>
 

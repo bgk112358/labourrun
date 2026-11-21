@@ -31,14 +31,18 @@ function request(options) {
       useAuth && token ? { Authorization: 'Bearer ' + token } : {},
       opts.header || {}
     );
+    const url = buildUrl(opts.url);
+    const method = opts.method || 'GET';
+    console.log('[request]', method, url);
 
     wx.request({
-      url: buildUrl(opts.url),
-      method: opts.method || 'GET',
+      url,
+      method,
       data: opts.data || {},
       header,
       timeout: opts.timeout || 15000,
       success(res) {
+        console.log('[request] success', method, url, res && res.statusCode);
         const body = (res && res.data) || {};
         if (
           res &&
@@ -70,6 +74,7 @@ function request(options) {
         reject(error);
       },
       fail(err) {
+        console.error('[request] fail', method, url, err);
         const error = new Error(
           (err && err.errMsg) || '网络异常，请稍后重试'
         );

@@ -33,6 +33,8 @@ function actionLabel(action: string) {
       logout: '退出',
       update_activity: '更新活动',
       update_challenge: '更新挑战',
+      update: '更新奖励',
+      lookup: '查询奖励',
     }[action] || action
   )
 }
@@ -43,6 +45,8 @@ function resourceLabel(value: string) {
       activity: '活动',
       challenge: '挑战',
       auth: '认证',
+      reward: '奖励配置',
+      reward_redemption: '奖励兑换',
     }[value] || value
   )
 }
@@ -118,7 +122,7 @@ onMounted(load)
     <div class="page-head">
       <div>
         <h2>审计日志</h2>
-        <p>查看管理员登录、活动与挑战修改记录。</p>
+        <p>查看管理员登录、活动/挑战修改、奖励配置与奖励查询记录。</p>
       </div>
       <el-button @click="load">刷新</el-button>
     </div>
@@ -139,6 +143,8 @@ onMounted(load)
         >
           <el-option label="活动" value="activity" />
           <el-option label="挑战" value="challenge" />
+          <el-option label="奖励配置" value="reward" />
+          <el-option label="奖励兑换" value="reward_redemption" />
           <el-option label="认证" value="auth" />
         </el-select>
         <el-date-picker

@@ -7,6 +7,7 @@ const path = require('path');
 const storage = Object.create(null);
 let pullDownStops = 0;
 let lastToast = '';
+let lastModal = { title: '', content: '' };
 
 function requestByNode(options) {
   const url = new URL(options.url);
@@ -97,6 +98,10 @@ global.wx = {
     pullDownStops += 1;
   },
   showModal(options) {
+    lastModal = {
+      title: options.title || '',
+      content: options.content || '',
+    };
     if (options.success) options.success({ confirm: true, cancel: false });
   },
   openSetting() {},
@@ -279,6 +284,53 @@ async function main() {
   assert(couponPage.data.balance === '0.66');
   assert(couponPage.data.list[0].amount === '0.66');
   console.log('[ok] coupon ledger', couponPage.data.list.length);
+
+  // 首页：奖品兑换、兑换券不足、奖励详情
+  await waitFor(
+    () => indexPage.data.rewards.some((item) => item.canRedeem),
+    'index rewards enabled'
+  );
+  const waterReward = indexPage.data.rewards.find(
+    (item) => item.id === 'rwd_water_bottle'
+  );
+  assert(waterReward && waterReward.couponCost === '0.50');
+  indexPage.onRewardTap({
+    currentTarget: { dataset: { id: waterReward.id } },
+  });
+  await waitFor(
+    () =>
+      indexPage.data.redeemingRewardId === '' &&
+      indexPage.data.rewards.find(
+        (item) => item.id === waterReward.id
+      ).redeemed === true,
+    'reward redeem'
+  );
+  const redeemedReward = indexPage.data.rewards.find(
+    (item) => item.id === waterReward.id
+  );
+  assert(/^LR-[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{8}$/.test(
+    redeemedReward.redemptionCode
+  ));
+  console.log('[ok] reward redeem', redeemedReward.redemptionCode);
+
+  indexPage.onRewardTap({
+    currentTarget: { dataset: { id: waterReward.id } },
+  });
+  assert(lastModal.title === '运动水杯');
+  assert(lastModal.content.indexOf(redeemedReward.redemptionCode) >= 0);
+
+  lastToast = '';
+  const towelReward = indexPage.data.rewards.find(
+    (item) => item.id === 'rwd_towel'
+  );
+  indexPage.onRewardTap({
+    currentTarget: { dataset: { id: towelReward.id } },
+  });
+  await waitFor(
+    () => lastToast === '兑换券不足',
+    'reward insufficient coupons'
+  );
+  console.log('[ok] reward insufficient coupons');
 
   // 我：昵称修改
   const userPage = createPage('pages/user/user.js');

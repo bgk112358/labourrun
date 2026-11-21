@@ -47,6 +47,8 @@ async function handleLogout() {
         <el-menu-item index="/activity">活动管理</el-menu-item>
         <el-menu-item index="/challenge">挑战管理</el-menu-item>
         <el-menu-item index="/registrations">报名管理</el-menu-item>
+        <el-menu-item index="/rewards">奖励管理</el-menu-item>
+        <el-menu-item index="/redemptions">奖励查询</el-menu-item>
         <el-menu-item index="/audit-logs">审计日志</el-menu-item>
       </el-menu>
     </el-aside>

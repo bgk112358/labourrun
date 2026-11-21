@@ -70,4 +70,12 @@ module.exports = {
   getChallenge() {
     return request({ url: '/challenges/current' });
   },
+
+  redeemReward(rewardId, data) {
+    return request({
+      url: '/rewards/' + rewardId + '/redeem',
+      method: 'POST',
+      data,
+    });
+  },
 };
